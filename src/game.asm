@@ -36,7 +36,7 @@
   ; first sprite
   LDA #$00
   STA $0200 ; Y-coord of first sprite
-  LDA #$00
+  LDA #$02
   STA $0201 ; tile number of first sprite
   LDA #$00
   STA $0202 ; attributes of first sprite
@@ -46,7 +46,7 @@
   ; second sprite
   LDA #$00
   STA $0204 ; Y-coord of first sprite
-  LDA #$01
+  LDA #$03
   STA $0205 ; tile number of first sprite
   LDA #$00
   STA $0206 ; attributes of first sprite
@@ -56,7 +56,7 @@
   ; second sprite
   LDA #$08
   STA $0208 ; Y-coord of first sprite
-  LDA #$10
+  LDA #$12
   STA $0209 ; tile number of first sprite
   LDA #$00
   STA $020A ; attributes of first sprite
@@ -66,7 +66,7 @@
   ; second sprite
   LDA #$08
   STA $020C ; Y-coord of first sprite
-  LDA #$11
+  LDA #$13
   STA $020D ; tile number of first sprite
   LDA #$00
   STA $020E ; attributes of first sprite
