@@ -37,7 +37,7 @@ load_sprites:
   LDA sprites,X
   STA $0200,X
   INX
-  CPX #$10       ; # Sprites x 4 bytes
+  CPX #$A0       ; # Sprites x 4 bytes
   BNE load_sprites
 
 vblankwait:       ; wait for another vblank before continuing
@@ -58,13 +58,24 @@ forever:
 
 .segment "RODATA"
 palettes:
-.byte $0F, $19, $09, $0f
+.byte $0F, $28, $30, $19
 
 sprites:
-.byte $70, $02, $00, $80
-.byte $70, $03, $00, $88
-.byte $78, $12, $00, $80
-.byte $78, $13, $00, $88
+; RIGHT
+.byte $70, $06, $00, $80
+.byte $70, $07, $00, $88
+.byte $78, $16, $00, $80
+.byte $78, $17, $00, $88
+
+.byte $70, $02, $00, $90
+.byte $70, $03, $00, $98
+.byte $78, $12, $00, $90
+.byte $78, $13, $00, $98
+
+.byte $70, $04, $00, $A0
+.byte $70, $05, $00, $A8
+.byte $78, $14, $00, $A0
+.byte $78, $15, $00, $A8
 
 .segment "CHR"
 .incbin "sprites.chr"
