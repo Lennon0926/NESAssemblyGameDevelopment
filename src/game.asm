@@ -37,7 +37,7 @@ load_sprites:
   LDA sprites,X
   STA $0200,X
   INX
-  CPX #$A0       ; # Sprites x 4 bytes
+  CPX #$FF       ; # Sprites x 4 bytes
   BNE load_sprites
 
 vblankwait:       ; wait for another vblank before continuing
@@ -108,6 +108,24 @@ sprites:
 .byte $60, $25, $00, $A8
 .byte $68, $34, $00, $A0
 .byte $68, $35, $00, $A8
+
+; DOWN
+.byte $98, $26, %10000000, $80
+.byte $98, $27, %10000000, $88
+.byte $90, $36, %10000000, $80
+.byte $90, $37, %10000000, $88
+
+.byte $98, $22, %10000000, $90
+.byte $98, $23, %10000000, $98
+.byte $90, $32, %10000000, $90
+.byte $90, $33, %10000000, $98
+
+.byte $98, $24, %10000000, $A0
+.byte $98, $25, %10000000, $A8
+.byte $90, $34, %10000000, $A0
+.byte $90, $35, %10000000, $A8
+
+
 
 .segment "CHR"
 .incbin "sprites.chr"
