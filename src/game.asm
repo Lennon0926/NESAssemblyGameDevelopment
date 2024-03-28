@@ -11,6 +11,9 @@
   STA OAMADDR
   LDA #$02
   STA OAMDMA
+  	LDA #$00
+	  STA $2005
+	  STA $2005
   RTI
 .endproc
 
@@ -40,6 +43,80 @@ load_sprites:
   CPX #$F0       ; # Sprites x 4 bytes
   BNE load_sprites
 
+  ; First Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$28
+	STA PPUADDR
+	LDX #$02
+	STX PPUDATA
+
+  ; Second Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$29
+	STA PPUADDR
+	LDX #$04
+	STX PPUDATA
+
+  ; Third Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2A
+	STA PPUADDR
+	LDX #$06
+	STX PPUDATA
+
+  ; Forth Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2B
+	STA PPUADDR
+	LDX #$08
+	STX PPUDATA
+
+  ; Fifth Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2C
+	STA PPUADDR
+	LDX #$22
+	STX PPUDATA
+
+  ; Sixth Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2D
+	STA PPUADDR
+	LDX #$24
+	STX PPUDATA
+
+  ; Sixth Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2E
+	STA PPUADDR
+	LDX #$26
+	STX PPUDATA
+  
+  ; Sixth Tile
+  LDA PPUSTATUS
+	LDA #$22
+	STA PPUADDR
+	LDA #$2F
+	STA PPUADDR
+	LDX #$28
+	STX PPUDATA
+
+
+
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
   BPL vblankwait
@@ -64,71 +141,71 @@ sprites:
 ; SPRITES
 ; RIGHT 
 ; Y, TILE, ATTR, X
-.byte $50, $07, $01, $68
-.byte $50, $06, $01, $60
-.byte $58, $16, $01, $60
-.byte $58, $17, $01, $68
+.byte $50, $42, $00, $60
+.byte $50, $43, $00, $68
+.byte $58, $52, $00, $60
+.byte $58, $53, $00, $68
 
-.byte $50, $02, $01, $70
-.byte $50, $03, $01, $78
-.byte $58, $12, $01, $70
-.byte $58, $13, $01, $78
+.byte $50, $44, $00, $70
+.byte $50, $45, $00, $78
+.byte $58, $54, $00, $70
+.byte $58, $55, $00, $78
 
-.byte $50, $04, $01, $80
-.byte $50, $05, $01, $88
-.byte $58, $14, $01, $80
-.byte $58, $15, $01, $88
+.byte $50, $46, $00, $80
+.byte $50, $47, $00, $88
+.byte $58, $56, $00, $80
+.byte $58, $57, $00, $88
 
 ; LEFT
 ; Y, TILE, ATTR, X
-.byte $60, $06, $41, $68
-.byte $60, $07, $41, $60
-.byte $68, $16, $41, $68
-.byte $68, $17, $41, $60
+.byte $60, $62, $00, $60
+.byte $60, $63, $00, $68
+.byte $68, $72, $00, $60
+.byte $68, $73, $00, $68
 
-.byte $60, $02, $41, $78
-.byte $60, $03, $41, $70
-.byte $68, $12, $41, $78
-.byte $68, $13, $41, $70
+.byte $60, $64, $00, $70
+.byte $60, $65, $00, $78
+.byte $68, $74, $00, $70
+.byte $68, $75, $00, $78
 
-.byte $60, $04, $41, $88
-.byte $60, $05, $41, $80
-.byte $68, $14, $41, $88
-.byte $68, $15, $41, $80
+.byte $60, $66, $00, $80
+.byte $60, $67, $00, $88
+.byte $68, $76, $00, $80
+.byte $68, $77, $00, $88
 
 ; UP
 ; Y, TILE, ATTR, X
-.byte $40, $26, $01, $60
-.byte $40, $27, $01, $68
-.byte $48, $36, $01, $60
-.byte $48, $37, $01, $68
+.byte $40, $22, $00, $60
+.byte $40, $23, $00, $68
+.byte $48, $32, $00, $60
+.byte $48, $33, $00, $68
 
-.byte $40, $22, $01, $70
-.byte $40, $23, $01, $78
-.byte $48, $32, $01, $70
-.byte $48, $33, $01, $78
+.byte $40, $24, $00, $70
+.byte $40, $25, $00, $78
+.byte $48, $34, $00, $70
+.byte $48, $35, $00, $78
 
-.byte $40, $24, $01, $80
-.byte $40, $25, $01, $88
-.byte $48, $34, $01, $80
-.byte $48, $35, $01, $88
+.byte $40, $26, $00, $80
+.byte $40, $27, $00, $88
+.byte $48, $36, $00, $80
+.byte $48, $37, $00, $88
 
 ; DOWN
 ; Y, TILE, ATTR, X
-.byte $78, $26, $81, $60
-.byte $78, $27, $81, $68
-.byte $70, $36, $81, $60
-.byte $70, $37, $81, $68
+.byte $70, $02, $00, $60
+.byte $70, $03, $00, $68
+.byte $78, $12, $00, $60
+.byte $78, $13, $00, $68
 
-.byte $78, $22, $81, $70
-.byte $78, $23, $81, $78
-.byte $70, $32, $81, $70
-.byte $70, $33, $81, $78
+.byte $70, $04, $00, $70
+.byte $70, $05, $00, $78
+.byte $78, $14, $00, $70
+.byte $78, $15, $00, $78
 
-.byte $78, $24, $81, $80
-.byte $78, $25, $81, $88
-.byte $70, $34, $81, $80
-.byte $70, $35, $81, $88
+.byte $70, $06, $00, $80
+.byte $70, $07, $00, $88
+.byte $78, $16, $00, $80
+.byte $78, $17, $00, $88
 
 .segment "CHR"
 .incbin "sprites.chr"
