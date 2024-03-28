@@ -1,6 +1,13 @@
 .include "constants.inc"
 .include "header.inc"
 
+.segment "ZEROPAGE"
+player_x: .res 1
+player_y: .res 1
+player_dir: .res 1
+frame_counter: .res 1
+.exportzp player_x, player_y, frame_counter
+
 .segment "CODE"
 .proc irq_handler
   RTI
@@ -11,9 +18,14 @@
   STA OAMADDR
   LDA #$02
   STA OAMDMA
-  	LDA #$00
-	  STA $2005
-	  STA $2005
+  LDA #$00
+
+  ; update tiles *after* DMA transfer
+  JSR update_player
+  JSR draw_player
+
+  STA $2005
+  STA $2005
   RTI
 .endproc
 
@@ -43,96 +55,6 @@ load_sprites:
   CPX #$F0       ; # Sprites x 4 bytes
   BNE load_sprites
 
-  ; First Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$28
-	STA PPUADDR
-	LDX #$02
-	STX PPUDATA
-
-  ; Second Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$29
-	STA PPUADDR
-	LDX #$04
-	STX PPUDATA
-
-  ; Third Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2A
-	STA PPUADDR
-	LDX #$06
-	STX PPUDATA
-
-  ; Forth Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2B
-	STA PPUADDR
-	LDX #$08
-	STX PPUDATA
-
-  ; Fifth Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2C
-	STA PPUADDR
-	LDX #$22
-	STX PPUDATA
-
-  ; Sixth Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2D
-	STA PPUADDR
-	LDX #$24
-	STX PPUDATA
-
-  ; Seventh Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2E
-	STA PPUADDR
-	LDX #$26
-	STX PPUDATA
-  
-  ; Eight Tile
-  LDA PPUSTATUS
-	LDA #$22
-	STA PPUADDR
-	LDA #$2F
-	STA PPUADDR
-	LDX #$28
-	STX PPUDATA
-
-  ; attribute table First Stage
-	LDA PPUSTATUS
-	LDA #$2B
-	STA PPUADDR
-	LDA #$E2
-	STA PPUADDR
-	LDA #%00001000
-	STA PPUDATA
-
-  ; attribute table Second Stage
-	LDA PPUSTATUS
-	LDA #$2B
-	STA PPUADDR
-	LDA #$E3
-	STA PPUADDR
-	LDA #%00000111
-	STA PPUDATA
-
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -146,6 +68,167 @@ vblankwait:       ; wait for another vblank before continuing
 forever:
   JMP forever
 .endproc
+
+.proc update_player
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+
+  LDA player_x
+  CMP #$e0
+  BCC not_at_right_edge
+  ; if BCC is not taken, we are greater than $e0
+  LDA #$00
+  STA player_dir    ; start moving left
+  JMP direction_set ; we already chose a direction,
+                    ; so we can skip the left side check
+not_at_right_edge:
+  LDA player_x
+  CMP #$10
+  BCS direction_set
+  ; if BCS not taken, we are less than $10
+  LDA #$01
+  STA player_dir   ; start moving right
+direction_set:
+  ; now, actually update player_x
+  LDA player_dir
+  CMP #$01
+  BEQ move_right
+  ; if player_dir minus $01 is not zero,
+  ; that means player_dir was $00 and
+  ; we need to move left
+  DEC player_x
+  JMP exit_subroutine
+move_right:
+  INC player_x
+
+exit_subroutine:
+  ; all done, clean up and return
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
+.endproc
+
+.proc draw_player
+  ; save registers
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+
+; Initialize player position
+  LDA #40  ; Set the initial Y position
+  STA player_y
+
+  ; Calculate tile number based on animation frame
+  LDA frame_counter
+  AND #$0F      ; Mask out lower 4 bits
+  CMP #$08      ; Check which frame of animation to use
+  BNE frame_1   ; If not the second frame, use the first frame
+  CMP #$0C      ; Check if it's the second or third frame
+  BCC frame_2   ; If less than 12, use the second frame
+
+frame_3:
+  ; Third frame of animation
+  LDA #$66      ; Use tile number for the third frame of animation
+  STA $0201
+  LDA #$67
+  STA $0205
+  LDA #$76
+  STA $0209
+  LDA #$77
+  STA $020d
+  JMP tile_set_done
+
+frame_2:
+  ; Second frame of animation
+  LDA #$44      ; Use tile number for the second frame of animation
+  STA $0201
+  LDA #$45
+  STA $0205
+  LDA #$54
+  STA $0209
+  LDA #$55
+  STA $020d
+  JMP tile_set_done
+
+frame_1:
+  ; First frame of animation
+  LDA #$42      ; Use tile number for the first frame of animation
+  STA $0201
+  LDA #$43
+  STA $0205
+  LDA #$52
+  STA $0209
+  LDA #$53
+  STA $020d
+
+tile_set_done:
+
+  ; write player ship tile attributes
+  ; use palette 0
+  LDA #$00
+  STA $0202
+  STA $0206
+  STA $020a
+  STA $020e
+
+  ; store tile locations
+  ; top left tile:
+  LDA player_y
+  STA $0200
+  LDA player_x
+  STA $0203
+
+  ; top right tile (x + 8):
+  LDA player_y
+  STA $0204
+  LDA player_x
+  CLC
+  ADC #$08
+  STA $0207
+
+  ; bottom left tile (y + 8):
+  LDA player_y
+  CLC
+  ADC #$08
+  STA $0208
+  LDA player_x
+  STA $020b
+
+  ; bottom right tile (x + 8, y + 8)
+  LDA player_y
+  CLC
+  ADC #$08
+  STA $020c
+  LDA player_x
+  CLC
+  ADC #$08
+  STA $020f
+
+  ; Increment frame counter
+  INC frame_counter
+
+  ; restore registers and return
+skip_animation:
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
+.endproc
+
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -163,74 +246,6 @@ palettes:
 .byte $0F, $00, $00, $00
 
 sprites:
-; SPRITES
-; RIGHT 
-; Y, TILE, ATTR, X
-.byte $50, $42, $00, $60
-.byte $50, $43, $00, $68
-.byte $58, $52, $00, $60
-.byte $58, $53, $00, $68
-
-.byte $50, $44, $00, $70
-.byte $50, $45, $00, $78
-.byte $58, $54, $00, $70
-.byte $58, $55, $00, $78
-
-.byte $50, $46, $00, $80
-.byte $50, $47, $00, $88
-.byte $58, $56, $00, $80
-.byte $58, $57, $00, $88
-
-; LEFT
-; Y, TILE, ATTR, X
-.byte $60, $62, $00, $60
-.byte $60, $63, $00, $68
-.byte $68, $72, $00, $60
-.byte $68, $73, $00, $68
-
-.byte $60, $64, $00, $70
-.byte $60, $65, $00, $78
-.byte $68, $74, $00, $70
-.byte $68, $75, $00, $78
-
-.byte $60, $66, $00, $80
-.byte $60, $67, $00, $88
-.byte $68, $76, $00, $80
-.byte $68, $77, $00, $88
-
-; UP
-; Y, TILE, ATTR, X
-.byte $40, $22, $00, $60
-.byte $40, $23, $00, $68
-.byte $48, $32, $00, $60
-.byte $48, $33, $00, $68
-
-.byte $40, $24, $00, $70
-.byte $40, $25, $00, $78
-.byte $48, $34, $00, $70
-.byte $48, $35, $00, $78
-
-.byte $40, $26, $00, $80
-.byte $40, $27, $00, $88
-.byte $48, $36, $00, $80
-.byte $48, $37, $00, $88
-
-; DOWN
-; Y, TILE, ATTR, X
-.byte $70, $02, $00, $60
-.byte $70, $03, $00, $68
-.byte $78, $12, $00, $60
-.byte $78, $13, $00, $68
-
-.byte $70, $04, $00, $70
-.byte $70, $05, $00, $78
-.byte $78, $14, $00, $70
-.byte $78, $15, $00, $78
-
-.byte $70, $06, $00, $80
-.byte $70, $07, $00, $88
-.byte $78, $16, $00, $80
-.byte $78, $17, $00, $88
 
 .segment "CHR"
 .incbin "sprites.chr"
