@@ -1,7 +1,10 @@
 .include "constants.inc"
 
 .segment "ZEROPAGE"
-.importzp player_x, player_y, frame_counter
+.importzp player_x, player_y, frame_counter, animation_counter
+.importzp player2_x, player2_y, frame_counter2, animation_counter2
+.importzp player3_x, player3_y, frame_counter3, animation_counter3
+.importzp player4_x, player4_y, frame_counter4, animation_counter4
 
 .segment "CODE"
 .import main
