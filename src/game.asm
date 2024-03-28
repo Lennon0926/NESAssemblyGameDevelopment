@@ -6,7 +6,8 @@ player_x: .res 1
 player_y: .res 1
 player_dir: .res 1
 frame_counter: .res 1
-.exportzp player_x, player_y, frame_counter
+animation_counter: .res 1
+.exportzp player_x, player_y, frame_counter, animation_counter
 
 .segment "CODE"
 .proc irq_handler
@@ -21,7 +22,6 @@ frame_counter: .res 1
   LDA #$00
 
   ; update tiles *after* DMA transfer
-  JSR update_player
   JSR draw_player
 
   STA $2005
@@ -69,53 +69,6 @@ forever:
   JMP forever
 .endproc
 
-.proc update_player
-  PHP
-  PHA
-  TXA
-  PHA
-  TYA
-  PHA
-
-  LDA player_x
-  CMP #$e0
-  BCC not_at_right_edge
-  ; if BCC is not taken, we are greater than $e0
-  LDA #$00
-  STA player_dir    ; start moving left
-  JMP direction_set ; we already chose a direction,
-                    ; so we can skip the left side check
-not_at_right_edge:
-  LDA player_x
-  CMP #$10
-  BCS direction_set
-  ; if BCS not taken, we are less than $10
-  LDA #$01
-  STA player_dir   ; start moving right
-direction_set:
-  ; now, actually update player_x
-  LDA player_dir
-  CMP #$01
-  BEQ move_right
-  ; if player_dir minus $01 is not zero,
-  ; that means player_dir was $00 and
-  ; we need to move left
-  DEC player_x
-  JMP exit_subroutine
-move_right:
-  INC player_x
-
-exit_subroutine:
-  ; all done, clean up and return
-  PLA
-  TAY
-  PLA
-  TAX
-  PLA
-  PLP
-  RTS
-.endproc
-
 .proc draw_player
   ; save registers
   PHP
@@ -126,26 +79,30 @@ exit_subroutine:
   PHA
 
 ; Initialize player position
-  LDA #40  ; Set the initial Y position
-  STA player_y
-
-  ; Calculate tile number based on animation frame
+  INC animation_counter
+  LDA animation_counter
+  AND #$04      ; Update animation every 4 cycles
+  BNE skip_animation
   LDA frame_counter
   AND #$0F      ; Mask out lower 4 bits
-  CMP #$08      ; Check which frame of animation to use
-  BNE frame_1   ; If not the second frame, use the first frame
-  CMP #$0C      ; Check if it's the second or third frame
-  BCC frame_2   ; If less than 12, use the second frame
+  CMP #$05      ; Check which frame of animation to use
+  BCC frame_1   ; If less than 5, use the first frame
+  CMP #$0A      ; Check if it's the second or third frame
+  BCC frame_2   ; If less than 10, use the second frame
+  JMP frame_3   ; Otherwise, use the third frame
+
+skip_animation:
+  JMP skip_animation_done
 
 frame_3:
   ; Third frame of animation
-  LDA #$66      ; Use tile number for the third frame of animation
+  LDA #$46      ; Use tile number for the third frame of animation
   STA $0201
-  LDA #$67
+  LDA #$47
   STA $0205
-  LDA #$76
+  LDA #$56
   STA $0209
-  LDA #$77
+  LDA #$57
   STA $020d
   JMP tile_set_done
 
@@ -171,6 +128,7 @@ frame_1:
   STA $0209
   LDA #$53
   STA $020d
+  JMP tile_set_done
 
 tile_set_done:
 
@@ -219,7 +177,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation:
+skip_animation_done:
   PLA
   TAY
   PLA
