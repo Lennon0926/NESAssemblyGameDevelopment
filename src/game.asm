@@ -11,9 +11,9 @@
   STA OAMADDR
   LDA #$02
   STA OAMDMA
-  	LDA #$00
-	  STA $2005
-	  STA $2005
+  LDA #$00
+  STA $2005
+  STA $2005
   RTI
 .endproc
 
