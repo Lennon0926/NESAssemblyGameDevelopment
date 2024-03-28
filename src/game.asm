@@ -31,7 +31,7 @@ load_palettes:
   LDA palettes,X
   STA PPUDATA
   INX
-  CPX #$10       ; # Palettes x 4 bytes
+  CPX #$20       ; # Palettes x 4 bytes
   BNE load_palettes
 
   ; write sprite data
@@ -97,7 +97,7 @@ load_sprites:
 	LDX #$24
 	STX PPUDATA
 
-  ; Sixth Tile
+  ; Seventh Tile
   LDA PPUSTATUS
 	LDA #$22
 	STA PPUADDR
@@ -106,7 +106,7 @@ load_sprites:
 	LDX #$26
 	STX PPUDATA
   
-  ; Sixth Tile
+  ; Eight Tile
   LDA PPUSTATUS
 	LDA #$22
 	STA PPUADDR
@@ -115,6 +115,23 @@ load_sprites:
 	LDX #$28
 	STX PPUDATA
 
+  ; attribute table First Stage
+	LDA PPUSTATUS
+	LDA #$2B
+	STA PPUADDR
+	LDA #$E2
+	STA PPUADDR
+	LDA #%00001000
+	STA PPUDATA
+
+  ; attribute table Second Stage
+	LDA PPUSTATUS
+	LDA #$2B
+	STA PPUADDR
+	LDA #$E3
+	STA PPUADDR
+	LDA #%00000111
+	STA PPUDATA
 
 
 vblankwait:       ; wait for another vblank before continuing
@@ -135,7 +152,15 @@ forever:
 
 .segment "RODATA"
 palettes:
-.byte $0F, $20, $15, $28
+.byte $0F, $05, $16, $27 ; Bricks
+.byte $0F, $0B, $1A, $29 ; Grass
+.byte $0F, $00, $10, $2D ; Gray scale
+.byte $0F, $09, $19, $3A
+
+.byte $0F, $36, $2A, $14
+.byte $0F, $00, $00, $00
+.byte $0F, $00, $00, $00
+.byte $0F, $00, $00, $00
 
 sprites:
 ; SPRITES
