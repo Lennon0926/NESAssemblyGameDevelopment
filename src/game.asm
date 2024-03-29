@@ -10,7 +10,7 @@ animation_counter: .res 1
 player2_x: .res 1
 player2_y: .res 1
 frame_counter2: .res 1
-animation_counter2: .res
+animation_counter2: .res 1
 
 player3_x: .res 1
 player3_y: .res 1
