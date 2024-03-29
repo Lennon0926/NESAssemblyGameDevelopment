@@ -10,7 +10,7 @@ animation_counter: .res 1
 player2_x: .res 1
 player2_y: .res 1
 frame_counter2: .res 1
-animation_counter2: .res 1
+animation_counter2: .res
 
 player3_x: .res 1
 player3_y: .res 1
@@ -22,6 +22,9 @@ player4_y: .res 1
 frame_counter4: .res 1
 animation_counter4: .res 1
 
+controller_input: .res 1
+
+.exportzp controller_input
 .exportzp player_x, player_y, frame_counter, animation_counter
 .exportzp player2_x, player2_y, frame_counter2, animation_counter2
 .exportzp player3_x, player3_y, frame_counter3, animation_counter3
@@ -39,7 +42,23 @@ animation_counter4: .res 1
   STA OAMDMA
   LDA #$00
 
-  ; update tiles *after* DMA transfer
+  ; Update controller input
+  JSR ReadController
+
+  ; Check if "A" key is pressed
+  LDA $4016
+  AND #%00000001
+  BEQ skip_movement
+
+  ; Move sprite based on "A" key press
+  LDA player_x
+  CLC
+  ADC #1
+  STA player_x
+
+skip_movement:
+
+  ; Draw sprites
   JSR draw_player
   JSR draw_player2
   JSR draw_player3
@@ -587,6 +606,23 @@ skip_animation:
   TAX
   PLA
   PLP
+  RTS
+.endproc
+
+.proc ReadController
+  ; Initialize the output memory
+  LDA #1
+  STA $4016
+
+  ; Send the latch pulse down to the 4021
+  LDA #0
+  STA $4016
+
+  ; Read the buttons from the data line
+  LDA $4016
+  AND #%00000001
+  STA controller_input
+
   RTS
 .endproc
 
