@@ -47,8 +47,8 @@ controller_input: .res 1
 
   ; Check if "A" key is pressed
   LDA $4016
-  AND #%00000001
-  BEQ skip_movement
+  AND #%10000001
+  BEQ ReadADone
 
   ; Move sprite based on "A" key press
   LDA player_x
@@ -56,7 +56,42 @@ controller_input: .res 1
   ADC #1
   STA player_x
 
-skip_movement:
+ReadADone:
+  LDA $4016
+  AND #%10000001
+  BEQ ReadBDone
+
+  ; Move sprite based on "B" key press
+  LDA player_x
+  SEC
+  SBC #1
+  STA player_x
+
+ReadBDone:
+
+  ; Check if "A" key is pressed
+  LDA $4016
+  AND #%10000011
+  BEQ ReadUpDone
+
+  ; Move sprite based on "A" key press
+  LDA player_y
+  CLC
+  ADC #1
+  STA player_y
+
+ReadUpDone:
+  LDA $4016
+  AND #%10000011
+  BEQ ReadDownDone
+
+  ; Move sprite based on "B" key press
+  LDA player_y
+  SEC
+  SBC #1
+  STA player_y
+
+ReadDownDone:
 
   ; Draw sprites
   JSR draw_player
@@ -119,9 +154,6 @@ forever:
   TYA
   PHA
 
-; Initialize player position
-  LDA #60  ; Set the initial Y position
-  STA player_y
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
@@ -613,16 +645,26 @@ skip_animation:
   ; Initialize the output memory
   LDA #1
   STA $4016
-
-  ; Send the latch pulse down to the 4021
   LDA #0
   STA $4016
 
   ; Read the buttons from the data line
   LDA $4016
-  AND #%00000001
+  AND #%10000001
   STA controller_input
 
+  ; Check if the "Up" button is pressed
+  LDA controller_input
+  AND #%00010000
+  BEQ checkDown
+
+checkDown:
+  ; Check if the "Down" button is pressed
+  LDA controller_input
+  AND #%00100000
+  BEQ done
+
+done:
   RTS
 .endproc
 
