@@ -134,20 +134,20 @@ forever:
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
-  AND #$03    ; Update animation every 4 cycles
+  AND #$03          ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
-  AND #$0F      ; Mask out lower 4 bits
-  CMP #$05      ; Check which frame of animation to use
-  BCC frame_1   ; If less than 5, use the first frame
-  CMP #$0A      ; Check if it's the second or third frame
-  BCC frame_2   ; If less than 10, use the second frame
-  JMP frame_3   ; Otherwise, use the third frame
+  AND #$0F          ; Mask out lower 4 bits
+  CMP #$05          ; Check which frame of animation to use
+  BCC frame1Right   ; If less than 5, use the first frame
+  CMP #$0A          ; Check if it's the second or third frame
+  BCC frame2Right   ; If less than 10, use the second frame
+  JMP frame3Right   ; Otherwise, use the third frame
 
 trampoline:
-  JMP skip_animation_player
+  JMP skipAnimation
 
-frame_3:
+frame3Right:
   ; Third frame of animation
   LDA #$46      ; Use tile number for the third frame of animation
   STA $0201
@@ -157,9 +157,9 @@ frame_3:
   STA $0209
   LDA #$57
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_2:
+frame2Right:
   ; Second frame of animation
   LDA #$44      ; Use tile number for the second frame of animation
   STA $0201
@@ -169,9 +169,9 @@ frame_2:
   STA $0209
   LDA #$55
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_1:
+frame1Right:
   ; First frame of animation
   LDA #$42      ; Use tile number for the first frame of animation
   STA $0201
@@ -181,9 +181,9 @@ frame_1:
   STA $0209
   LDA #$53
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-tile_set_done:
+setTile:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -230,7 +230,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation_player:
+skipAnimation:
   PLA
   TAY
   PLA
@@ -252,20 +252,20 @@ skip_animation_player:
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
-  AND #$03      ; Update animation every 4 cycles
+  AND #$03         ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
-  AND #$0F      ; Mask out lower 4 bits
-  CMP #$05      ; Check which frame of animation to use
-  BCC frame_1   ; If less than 5, use the first frame
-  CMP #$0A      ; Check if it's the second or third frame
-  BCC frame_2   ; If less than 10, use the second frame
-  JMP frame_3   ; Otherwise, use the third frame
+  AND #$0F         ; Mask out lower 4 bits
+  CMP #$05         ; Check which frame of animation to use
+  BCC frame1Left   ; If less than 5, use the first frame
+  CMP #$0A         ; Check if it's the second or third frame
+  BCC frame2Left   ; If less than 10, use the second frame
+  JMP frame3Left   ; Otherwise, use the third frame
 
 trampoline:
-  JMP skip_animation_player
+  JMP skipAnimation
 
-frame_3:
+frame3Left:
   ; Third frame of animation
   LDA #$66      ; Use tile number for the third frame of animation
   STA $0201
@@ -275,9 +275,9 @@ frame_3:
   STA $0209
   LDA #$77
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_2:
+frame2Left:
   ; Second frame of animation
   LDA #$64      ; Use tile number for the second frame of animation
   STA $0201
@@ -287,9 +287,9 @@ frame_2:
   STA $0209
   LDA #$75
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_1:
+frame1Left:
   ; First frame of animation
   LDA #$62      ; Use tile number for the first frame of animation
   STA $0201
@@ -299,9 +299,9 @@ frame_1:
   STA $0209
   LDA #$73
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-tile_set_done:
+setTile:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -348,7 +348,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation_player:
+skipAnimation:
   PLA
   TAY
   PLA
@@ -370,20 +370,20 @@ skip_animation_player:
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
-  AND #$03      ; Update animation every 4 cycles
+  AND #$03          ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
-  AND #$0F      ; Mask out lower 4 bits
-  CMP #$05      ; Check which frame of animation to use
-  BCC frame_1   ; If less than 5, use the first frame
-  CMP #$0A      ; Check if it's the second or third frame
-  BCC frame_2   ; If less than 10, use the second frame
-  JMP frame_3   ; Otherwise, use the third frame
+  AND #$0F          ; Mask out lower 4 bits
+  CMP #$05          ; Check which frame of animation to use
+  BCC frame1Up      ; If less than 5, use the first frame
+  CMP #$0A          ; Check if it's the second or third frame
+  BCC frame2Up      ; If less than 10, use the second frame
+  JMP frame3Up      ; Otherwise, use the third frame
 
 trampoline:
-  JMP skip_animation_player
+  JMP skipAnimation
 
-frame_3:
+frame3Up:
   ; Third frame of animation
   LDA #$26      ; Use tile number for the third frame of animation
   STA $0201
@@ -393,9 +393,9 @@ frame_3:
   STA $0209
   LDA #$37
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_2:
+frame2Up:
   ; Second frame of animation
   LDA #$24      ; Use tile number for the second frame of animation
   STA $0201
@@ -405,9 +405,9 @@ frame_2:
   STA $0209
   LDA #$35
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_1:
+frame1Up:
   ; First frame of animation
   LDA #$22      ; Use tile number for the first frame of animation
   STA $0201
@@ -417,9 +417,9 @@ frame_1:
   STA $0209
   LDA #$33
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-tile_set_done:
+setTile:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -466,7 +466,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation_player:
+skipAnimation:
   PLA
   TAY
   PLA
@@ -488,20 +488,20 @@ skip_animation_player:
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
-  AND #$03      ; Update animation every 4 cycles
+  AND #$03         ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
-  AND #$0F      ; Mask out lower 4 bits
-  CMP #$05      ; Check which frame of animation to use
-  BCC frame_1   ; If less than 5, use the first frame
-  CMP #$0A      ; Check if it's the second or third frame
-  BCC frame_2   ; If less than 10, use the second frame
-  JMP frame_3   ; Otherwise, use the third frame
+  AND #$0F         ; Mask out lower 4 bits
+  CMP #$05         ; Check which frame of animation to use
+  BCC frame1Down   ; If less than 5, use the first frame
+  CMP #$0A         ; Check if it's the second or third frame
+  BCC frame2Down   ; If less than 10, use the second frame
+  JMP frame3Down   ; Otherwise, use the third frame
 
 trampoline:
-  JMP skip_animation_player
+  JMP skipAnimation
 
-frame_3:
+frame3Down:
   ; Third frame of animation
   LDA #$06      ; Use tile number for the third frame of animation
   STA $0201
@@ -511,9 +511,9 @@ frame_3:
   STA $0209
   LDA #$17
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_2:
+frame2Down:
   ; Second frame of animation
   LDA #$04      ; Use tile number for the second frame of animation
   STA $0201
@@ -523,9 +523,9 @@ frame_2:
   STA $0209
   LDA #$15
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-frame_1:
+frame1Down:
   ; First frame of animation
   LDA #$02      ; Use tile number for the first frame of animation
   STA $0201
@@ -535,9 +535,9 @@ frame_1:
   STA $0209
   LDA #$13
   STA $020d
-  JMP tile_set_done
+  JMP setTile
 
-tile_set_done:
+setTile:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -584,7 +584,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation_player:
+skipAnimation:
   PLA
   TAY
   PLA
