@@ -23,7 +23,6 @@ controller_input: .res 1
   STA OAMDMA
   LDA #$00
 
-  ; Update controller input
   JSR ReadController
 
   ; Check if "A" key is pressed
