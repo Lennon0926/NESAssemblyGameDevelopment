@@ -4,6 +4,7 @@
 .segment "ZEROPAGE"
 player_x: .res 1
 player_y: .res 1
+direction: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
 controller_input: .res 1
@@ -122,7 +123,7 @@ forever:
   JMP forever
 .endproc
 
-.proc drawRight
+.proc updateAnimation
   ; save registers
   PHP
   PHA
@@ -131,21 +132,35 @@ forever:
   TYA
   PHA
 
-; Initialize player position
+  ; Initialize player position
   INC animation_counter
   LDA animation_counter
   AND #$03          ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
   AND #$0F          ; Mask out lower 4 bits
-  CMP #$05          ; Check which frame of animation to use
+
+  ; Check which frame of animation to use based on direction
+  LDA direction
+  CMP #$00          ; Right
+  BEQ rightFrames
+  CMP #$01          ; Left
+  BEQ leftFrames
+  CMP #$02          ; Up
+  BEQ upFramesTrampoline
+  CMP #$03          ; Down
+  BEQ downFramesTrampoline
+  JMP skipAnimation
+
+trampoline:
+  JMP skipAnimation
+
+rightFrames:
+  CMP #$05          ; Check which frame of animation to use for right
   BCC frame1Right   ; If less than 5, use the first frame
   CMP #$0A          ; Check if it's the second or third frame
   BCC frame2Right   ; If less than 10, use the second frame
   JMP frame3Right   ; Otherwise, use the third frame
-
-trampoline:
-  JMP skipAnimation
 
 frame3Right:
   ; Third frame of animation
@@ -183,87 +198,18 @@ frame1Right:
   STA $020d
   JMP setTile
 
-setTile:
+upFramesTrampoline:
+  JMP upFrames
 
-  ; write player ship tile attributes
-  ; use palette 0
-  LDA #$00
-  STA $0202
-  STA $0206
-  STA $020a
-  STA $020e
-
-  ; store tile locations
-  ; top left tile:
-  LDA player_y
-  STA $0200
-  LDA player_x
-  STA $0203
-
-  ; top right tile (x + 8):
-  LDA player_y
-  STA $0204
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $0207
-
-  ; bottom left tile (y + 8):
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $0208
-  LDA player_x
-  STA $020b
-
-  ; bottom right tile (x + 8, y + 8)
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $020c
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $020f
-
-  ; Increment frame counter
-  INC frame_counter
-
-  ; restore registers and return
-skipAnimation:
-  PLA
-  TAY
-  PLA
-  TAX
-  PLA
-  PLP
-  RTS
-.endproc
-
-.proc drawLeft
-  ; save registers
-  PHP
-  PHA
-  TXA
-  PHA
-  TYA
-  PHA
-
-; Initialize player position
-  INC animation_counter
-  LDA animation_counter
-  AND #$03         ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter
-  AND #$0F         ; Mask out lower 4 bits
-  CMP #$05         ; Check which frame of animation to use
-  BCC frame1Left   ; If less than 5, use the first frame
-  CMP #$0A         ; Check if it's the second or third frame
-  BCC frame2Left   ; If less than 10, use the second frame
-  JMP frame3Left   ; Otherwise, use the third frame
-
-trampoline:
-  JMP skipAnimation
+downFramesTrampoline:
+  JMP downFrames
+  
+leftFrames:
+  CMP #$05          ; Check which frame of animation to use for right
+  BCC frame1Left    ; If less than 5, use the first frame
+  CMP #$0A          ; Check if it's the second or third frame
+  BCC frame2Left    ; If less than 10, use the second frame
+  JMP frame3Left    ; Otherwise, use the third frame
 
 frame3Left:
   ; Third frame of animation
@@ -301,87 +247,12 @@ frame1Left:
   STA $020d
   JMP setTile
 
-setTile:
-
-  ; write player ship tile attributes
-  ; use palette 0
-  LDA #$00
-  STA $0202
-  STA $0206
-  STA $020a
-  STA $020e
-
-  ; store tile locations
-  ; top left tile:
-  LDA player_y
-  STA $0200
-  LDA player_x
-  STA $0203
-
-  ; top right tile (x + 8):
-  LDA player_y
-  STA $0204
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $0207
-
-  ; bottom left tile (y + 8):
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $0208
-  LDA player_x
-  STA $020b
-
-  ; bottom right tile (x + 8, y + 8)
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $020c
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $020f
-
-  ; Increment frame counter
-  INC frame_counter
-
-  ; restore registers and return
-skipAnimation:
-  PLA
-  TAY
-  PLA
-  TAX
-  PLA
-  PLP
-  RTS
-.endproc
-
-.proc drawUp
-  ; save registers
-  PHP
-  PHA
-  TXA
-  PHA
-  TYA
-  PHA
-
-; Initialize player position
-  INC animation_counter
-  LDA animation_counter
-  AND #$03          ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter
-  AND #$0F          ; Mask out lower 4 bits
-  CMP #$05          ; Check which frame of animation to use
+upFrames:
+  CMP #$05          ; Check which frame of animation to use for right	 
   BCC frame1Up      ; If less than 5, use the first frame
   CMP #$0A          ; Check if it's the second or third frame
   BCC frame2Up      ; If less than 10, use the second frame
   JMP frame3Up      ; Otherwise, use the third frame
-
-trampoline:
-  JMP skipAnimation
 
 frame3Up:
   ; Third frame of animation
@@ -419,87 +290,12 @@ frame1Up:
   STA $020d
   JMP setTile
 
-setTile:
-
-  ; write player ship tile attributes
-  ; use palette 0
-  LDA #$00
-  STA $0202
-  STA $0206
-  STA $020a
-  STA $020e
-
-  ; store tile locations
-  ; top left tile:
-  LDA player_y
-  STA $0200
-  LDA player_x
-  STA $0203
-
-  ; top right tile (x + 8):
-  LDA player_y
-  STA $0204
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $0207
-
-  ; bottom left tile (y + 8):
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $0208
-  LDA player_x
-  STA $020b
-
-  ; bottom right tile (x + 8, y + 8)
-  LDA player_y
-  CLC
-  ADC #$08
-  STA $020c
-  LDA player_x
-  CLC
-  ADC #$08
-  STA $020f
-
-  ; Increment frame counter
-  INC frame_counter
-
-  ; restore registers and return
-skipAnimation:
-  PLA
-  TAY
-  PLA
-  TAX
-  PLA
-  PLP
-  RTS
-.endproc
-
-.proc drawDown
-  ; save registers
-  PHP
-  PHA
-  TXA
-  PHA
-  TYA
-  PHA
-
-; Initialize player position
-  INC animation_counter
-  LDA animation_counter
-  AND #$03         ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter
-  AND #$0F         ; Mask out lower 4 bits
-  CMP #$05         ; Check which frame of animation to use
-  BCC frame1Down   ; If less than 5, use the first frame
-  CMP #$0A         ; Check if it's the second or third frame
-  BCC frame2Down   ; If less than 10, use the second frame
-  JMP frame3Down   ; Otherwise, use the third frame
-
-trampoline:
-  JMP skipAnimation
+downFrames:
+  CMP #$05          ; Check which frame of animation to use for right
+  BCC frame1Down    ; If less than 5, use the first frame
+  CMP #$0A          ; Check if it's the second or third frame
+  BCC frame2Down    ; If less than 10, use the second frame
+  JMP frame3Down    ; Otherwise, use the third frame
 
 frame3Down:
   ; Third frame of animation
@@ -538,7 +334,6 @@ frame1Down:
   JMP setTile
 
 setTile:
-
   ; write player ship tile attributes
   ; use palette 0
   LDA #$00
@@ -591,6 +386,34 @@ skipAnimation:
   TAX
   PLA
   PLP
+  RTS
+.endproc
+
+.proc drawRight
+  LDA #$00   ; Set direction to Right
+  STA direction
+  JSR updateAnimation
+  RTS
+.endproc
+
+.proc drawLeft
+  LDA #$01   ; Set direction to Left
+  STA direction
+  JSR updateAnimation
+  RTS
+.endproc
+
+.proc drawUp
+  LDA #$02   ; Set direction to Up
+  STA direction
+  JSR updateAnimation
+  RTS
+.endproc
+
+.proc drawDown
+  LDA #$03   ; Set direction to Down
+  STA direction
+  JSR updateAnimation
   RTS
 .endproc
 
