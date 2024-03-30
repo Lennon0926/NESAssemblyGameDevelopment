@@ -6,29 +6,10 @@ player_x: .res 1
 player_y: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
-
-player2_x: .res 1
-player2_y: .res 1
-frame_counter2: .res 1
-animation_counter2: .res 1
-
-player3_x: .res 1
-player3_y: .res 1
-frame_counter3: .res 1
-animation_counter3: .res 1
-
-player4_x: .res 1
-player4_y: .res 1
-frame_counter4: .res 1
-animation_counter4: .res 1
-
 controller_input: .res 1
 
 .exportzp controller_input
 .exportzp player_x, player_y, frame_counter, animation_counter
-.exportzp player2_x, player2_y, frame_counter2, animation_counter2
-.exportzp player3_x, player3_y, frame_counter3, animation_counter3
-.exportzp player4_x, player4_y, frame_counter4, animation_counter4
 
 .segment "CODE"
 .proc irq_handler
@@ -51,6 +32,7 @@ controller_input: .res 1
   BEQ ReadADone
 
   ; Move sprite based on "A" key press
+  JSR draw_player
   LDA player_x
   CLC
   ADC #1
@@ -62,19 +44,20 @@ ReadADone:
   BEQ ReadBDone
 
   ; Move sprite based on "B" key press
+  JSR draw_player2
   LDA player_x
   SEC
   SBC #1
   STA player_x
 
 ReadBDone:
-
   ; Check if "A" key is pressed
   LDA $4016
   AND #%10000011
   BEQ ReadUpDone
 
-  ; Move sprite based on "A" key press
+  ; Move sprite based on "Up" key press
+  JSR draw_player4
   LDA player_y
   CLC
   ADC #1
@@ -85,23 +68,31 @@ ReadUpDone:
   AND #%10000011
   BEQ ReadDownDone
 
-  ; Move sprite based on "B" key press
+  ; Move sprite based on "Down" key press
+  JSR draw_player3
   LDA player_y
   SEC
   SBC #1
   STA player_y
 
 ReadDownDone:
-
-  ; Draw sprites
-  JSR draw_player
-  JSR draw_player2
-  JSR draw_player3
-  JSR draw_player4
-
   STA $2005
   STA $2005
   RTI
+.endproc
+
+.proc ClearOAMBuffer
+  LDX #$00
+  ClearOAMLoop:
+    LDA #$00
+    STA $0200, X
+    STA $0201, X
+    STA $0202, X
+    STA $0203, X
+    INX
+    CPX #$F0
+    BCC ClearOAMLoop
+  RTS
 .endproc
 
 .import reset_handler
@@ -130,7 +121,6 @@ load_sprites:
   CPX #$F0       ; # Sprites x 4 bytes
   BNE load_sprites
 
-
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
   BPL vblankwait
@@ -157,7 +147,7 @@ forever:
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
-  AND #$04      ; Update animation every 4 cycles
+  AND #$03    ; Update animation every 4 cycles
   BNE trampoline
   LDA frame_counter
   AND #$0F      ; Mask out lower 4 bits
@@ -168,7 +158,7 @@ forever:
   JMP frame_3   ; Otherwise, use the third frame
 
 trampoline:
-  JMP skip_animation
+  JMP skip_animation_player
 
 frame_3:
   ; Third frame of animation
@@ -253,7 +243,7 @@ tile_set_done:
   INC frame_counter
 
   ; restore registers and return
-skip_animation:
+skip_animation_player:
   PLA
   TAY
   PLA
@@ -274,18 +264,11 @@ skip_animation:
   PHA
 
 ; Initialize player position
-  LDA #60  ; Set the initial Y position
-  STA player2_y
-
-  LDA #80  ; Set the initial X position
-  STA player2_x
-
-; Initialize player position
-  INC animation_counter2
-  LDA animation_counter2
-  AND #$04      ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter2
+  INC animation_counter
+  LDA animation_counter
+  AND #$03      ; Update animation every 4 cycles
+  BNE trampoline2
+  LDA frame_counter
   AND #$0F      ; Mask out lower 4 bits
   CMP #$05      ; Check which frame of animation to use
   BCC frame_1   ; If less than 5, use the first frame
@@ -293,8 +276,8 @@ skip_animation:
   BCC frame_2   ; If less than 10, use the second frame
   JMP frame_3   ; Otherwise, use the third frame
 
-trampoline:
-  JMP skip_animation
+trampoline2:
+  JMP skip_animation_player2
 
 frame_3:
   ; Third frame of animation
@@ -306,7 +289,7 @@ frame_3:
   STA $0219
   LDA #$77
   STA $021d
-  JMP tile_set_done
+  JMP tile_set_done2
 
 frame_2:
   ; Second frame of animation
@@ -318,7 +301,7 @@ frame_2:
   STA $0219
   LDA #$75
   STA $021d
-  JMP tile_set_done
+  JMP tile_set_done2
 
 frame_1:
   ; First frame of animation
@@ -330,9 +313,9 @@ frame_1:
   STA $0219
   LDA #$73
   STA $021d
-  JMP tile_set_done
+  JMP tile_set_done2
 
-tile_set_done:
+tile_set_done2:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -344,42 +327,42 @@ tile_set_done:
 
   ; store tile locations
   ; top left tile:
-  LDA player2_y
+  LDA player_y
   STA $0210
-  LDA player2_x
+  LDA player_x
   STA $0213
 
   ; top right tile (x + 8):
-  LDA player2_y
+  LDA player_y
   STA $0214
-  LDA player2_x
+  LDA player_x
   CLC
   ADC #$08
   STA $0217
 
   ; bottom left tile (y + 8):
-  LDA player2_y
+  LDA player_y
   CLC
   ADC #$08
   STA $0218
-  LDA player2_x
+  LDA player_x
   STA $021b
 
   ; bottom right tile (x + 8, y + 8)
-  LDA player2_y
+  LDA player_y
   CLC
   ADC #$08
   STA $021c
-  LDA player2_x
+  LDA player_x
   CLC
   ADC #$08
   STA $021f
 
   ; Increment frame counter
-  INC frame_counter2
+  INC frame_counter
 
   ; restore registers and return
-skip_animation:
+skip_animation_player2:
   PLA
   TAY
   PLA
@@ -400,18 +383,11 @@ skip_animation:
   PHA
 
 ; Initialize player position
-  LDA #30  ; Set the initial Y position
-  STA player3_y
-
-  LDA #105  ; Set the initial X position
-  STA player3_x
-
-; Initialize player position
-  INC animation_counter3
-  LDA animation_counter3
-  AND #$04      ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter3
+  INC animation_counter
+  LDA animation_counter
+  AND #$03      ; Update animation every 4 cycles
+  BNE trampoline3
+  LDA frame_counter
   AND #$0F      ; Mask out lower 4 bits
   CMP #$05      ; Check which frame of animation to use
   BCC frame_1   ; If less than 5, use the first frame
@@ -419,8 +395,8 @@ skip_animation:
   BCC frame_2   ; If less than 10, use the second frame
   JMP frame_3   ; Otherwise, use the third frame
 
-trampoline:
-  JMP skip_animation
+trampoline3:
+  JMP skip_animation_player3
 
 frame_3:
   ; Third frame of animation
@@ -432,7 +408,7 @@ frame_3:
   STA $0229
   LDA #$37
   STA $022d
-  JMP tile_set_done
+  JMP tile_set_done3
 
 frame_2:
   ; Second frame of animation
@@ -444,7 +420,7 @@ frame_2:
   STA $0229
   LDA #$35
   STA $022d
-  JMP tile_set_done
+  JMP tile_set_done3
 
 frame_1:
   ; First frame of animation
@@ -456,9 +432,9 @@ frame_1:
   STA $0229
   LDA #$33
   STA $022d
-  JMP tile_set_done
+  JMP tile_set_done3
 
-tile_set_done:
+tile_set_done3:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -470,42 +446,42 @@ tile_set_done:
 
   ; store tile locations
   ; top left tile:
-  LDA player3_y
+  LDA player_y
   STA $0220
-  LDA player3_x
+  LDA player_x
   STA $0223
 
   ; top right tile (x + 8):
-  LDA player3_y
+  LDA player_y
   STA $0224
-  LDA player3_x
+  LDA player_x
   CLC
   ADC #$08
   STA $0227
 
   ; bottom left tile (y + 8):
-  LDA player3_y
+  LDA player_y
   CLC
   ADC #$08
   STA $0228
-  LDA player3_x
+  LDA player_x
   STA $022b
 
   ; bottom right tile (x + 8, y + 8)
-  LDA player3_y
+  LDA player_y
   CLC
   ADC #$08
   STA $022c
-  LDA player3_x
+  LDA player_x
   CLC
   ADC #$08
   STA $022f
 
   ; Increment frame counter
-  INC frame_counter3
+  INC frame_counter
 
   ; restore registers and return
-skip_animation:
+skip_animation_player3:
   PLA
   TAY
   PLA
@@ -526,18 +502,11 @@ skip_animation:
   PHA
 
 ; Initialize player position
-  LDA #90  ; Set the initial Y position
-  STA player4_y
-
-  LDA #105  ; Set the initial X position
-  STA player4_x
-
-; Initialize player position
-  INC animation_counter4
-  LDA animation_counter4
-  AND #$04      ; Update animation every 4 cycles
-  BNE trampoline
-  LDA frame_counter4
+  INC animation_counter
+  LDA animation_counter
+  AND #$03      ; Update animation every 4 cycles
+  BNE trampoline4
+  LDA frame_counter
   AND #$0F      ; Mask out lower 4 bits
   CMP #$05      ; Check which frame of animation to use
   BCC frame_1   ; If less than 5, use the first frame
@@ -545,8 +514,8 @@ skip_animation:
   BCC frame_2   ; If less than 10, use the second frame
   JMP frame_3   ; Otherwise, use the third frame
 
-trampoline:
-  JMP skip_animation
+trampoline4:
+  JMP skip_animation_player4
 
 frame_3:
   ; Third frame of animation
@@ -558,7 +527,7 @@ frame_3:
   STA $0239
   LDA #$17
   STA $023d
-  JMP tile_set_done
+  JMP tile_set_done4
 
 frame_2:
   ; Second frame of animation
@@ -570,7 +539,7 @@ frame_2:
   STA $0239
   LDA #$15
   STA $023d
-  JMP tile_set_done
+  JMP tile_set_done4
 
 frame_1:
   ; First frame of animation
@@ -582,9 +551,9 @@ frame_1:
   STA $0239
   LDA #$13
   STA $023d
-  JMP tile_set_done
+  JMP tile_set_done4
 
-tile_set_done:
+tile_set_done4:
 
   ; write player ship tile attributes
   ; use palette 0
@@ -596,42 +565,42 @@ tile_set_done:
 
   ; store tile locations
   ; top left tile:
-  LDA player4_y
+  LDA player_y
   STA $0230
-  LDA player4_x
+  LDA player_x
   STA $0233
 
   ; top right tile (x + 8):
-  LDA player4_y
+  LDA player_y
   STA $0234
-  LDA player4_x
+  LDA player_x
   CLC
   ADC #$08
   STA $0237
 
   ; bottom left tile (y + 8):
-  LDA player4_y
+  LDA player_y
   CLC
   ADC #$08
   STA $0238
-  LDA player4_x
+  LDA player_x
   STA $023b
 
   ; bottom right tile (x + 8, y + 8)
-  LDA player4_y
+  LDA player_y
   CLC
   ADC #$08
   STA $023c
-  LDA player4_x
+  LDA player_x
   CLC
   ADC #$08
   STA $023f
 
   ; Increment frame counter
-  INC frame_counter4
+  INC frame_counter
 
   ; restore registers and return
-skip_animation:
+skip_animation_player4:
   PLA
   TAY
   PLA
