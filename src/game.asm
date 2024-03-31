@@ -103,6 +103,9 @@ forever:
 ; Initialize player position
   LDA #60  ; Set the initial Y position
   STA player_y
+
+  LDA #130
+  STA player_x
 ; Initialize player position
   INC animation_counter
   LDA animation_counter
