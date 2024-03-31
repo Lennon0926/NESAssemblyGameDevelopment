@@ -36,10 +36,25 @@ clear_oam:
 	BNE clear_oam
 
   ; initialize zero-page values
-	LDA #$80
+	LDA #130
 	STA player_x
-	LDA #$a0
+	LDA #60
 	STA player_y
+
+  LDA #80
+	STA player2_x
+	LDA #60
+	STA player2_y
+
+  LDA #105
+	STA player3_x
+	LDA #30
+	STA player3_y
+
+  LDA #105
+	STA player4_x
+	LDA #90
+	STA player4_y
   
 vblankwait2:
   BIT PPUSTATUS
