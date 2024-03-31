@@ -30,6 +30,8 @@ animation_counter: .res 1
 	; and after reading controller state
 	JSR update_player
 
+  STA $2005
+  STA $2005
   RTI
 .endproc
 
@@ -43,6 +45,7 @@ animation_counter: .res 1
   STX PPUADDR
   LDX #$00
   STX PPUADDR
+
 load_palettes:
   LDA palettes,X
   STA PPUDATA
