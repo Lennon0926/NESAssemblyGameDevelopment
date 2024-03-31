@@ -31,7 +31,7 @@ load_palettes:
   LDA palettes,X
   STA PPUDATA
   INX
-  CPX #$20       ; # Palettes x 4 bytes
+  CPX #$20
   BNE load_palettes
 
   ; write sprite data
@@ -40,7 +40,7 @@ load_sprites:
   LDA sprites,X
   STA $0200,X
   INX
-  CPX #$F0       ; # Sprites x 4 bytes
+  CPX #$C0
   BNE load_sprites
 
   ; First Tile
@@ -117,7 +117,7 @@ load_sprites:
 
   ; attribute table First Stage
 	LDA PPUSTATUS
-	LDA #$2B
+	LDA #$23
 	STA PPUADDR
 	LDA #$E2
 	STA PPUADDR
@@ -126,7 +126,7 @@ load_sprites:
 
   ; attribute table Second Stage
 	LDA PPUSTATUS
-	LDA #$2B
+	LDA #$23
 	STA PPUADDR
 	LDA #$E3
 	STA PPUADDR
@@ -163,9 +163,7 @@ palettes:
 .byte $0F, $00, $00, $00
 
 sprites:
-; SPRITES
 ; RIGHT 
-; Y, TILE, ATTR, X
 .byte $50, $42, $00, $60
 .byte $50, $43, $00, $68
 .byte $58, $52, $00, $60
@@ -182,7 +180,6 @@ sprites:
 .byte $58, $57, $00, $88
 
 ; LEFT
-; Y, TILE, ATTR, X
 .byte $60, $62, $00, $60
 .byte $60, $63, $00, $68
 .byte $68, $72, $00, $60
@@ -199,7 +196,6 @@ sprites:
 .byte $68, $77, $00, $88
 
 ; UP
-; Y, TILE, ATTR, X
 .byte $40, $22, $00, $60
 .byte $40, $23, $00, $68
 .byte $48, $32, $00, $60
@@ -216,7 +212,6 @@ sprites:
 .byte $48, $37, $00, $88
 
 ; DOWN
-; Y, TILE, ATTR, X
 .byte $70, $02, $00, $60
 .byte $70, $03, $00, $68
 .byte $78, $12, $00, $60
