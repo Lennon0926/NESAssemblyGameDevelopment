@@ -4,17 +4,19 @@
 .segment "ZEROPAGE"
 player_x: .res 1
 player_y: .res 1
+player_dir: .res 1
+pad1: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
-controller_input: .res 1
 
-.exportzp controller_input
-.exportzp player_x, player_y, frame_counter, animation_counter
+.exportzp player_x, player_y, pad1, frame_counter, animation_counter
 
 .segment "CODE"
 .proc irq_handler
   RTI
 .endproc
+
+.import ReadController
 
 .proc nmi_handler
   LDA #$00
@@ -24,61 +26,10 @@ controller_input: .res 1
   LDA #$00
 
   JSR ReadController
+  ; update tiles *after* DMA transfer
+	; and after reading controller state
+	JSR update_player
 
-  ; Check if "A" key is pressed
-  LDA $4016
-  AND #%10000001
-  BEQ ReadADone
-
-  ; Move sprite based on "A" key press
-  JSR drawRight
-  LDA player_x
-  CLC
-  ADC #1
-  STA player_x
-
-ReadADone:
-  LDA $4016
-  AND #%10000001
-  BEQ ReadBDone
-
-  ; Move sprite based on "B" key press
-  JSR drawLeft
-
-  LDA player_x
-  SEC
-  SBC #1
-  STA player_x
-
-ReadBDone:
-  ; Check if "A" key is pressed
-  LDA $4016
-  AND #%10000011
-  BEQ ReadUpDone
-
-  ; Move sprite based on "Up" key press
-  JSR drawDown
-  LDA player_y
-  CLC
-  ADC #1
-  STA player_y
-
-ReadUpDone:
-  LDA $4016
-  AND #%10000011
-  BEQ ReadDownDone
-
-  ; Move sprite based on "Down" key press
-  JSR drawUp
-
-  LDA player_y
-  SEC
-  SBC #1
-  STA player_y
-
-ReadDownDone:
-  STA $2005
-  STA $2005
   RTI
 .endproc
 
@@ -593,30 +544,44 @@ skipAnimation:
   RTS
 .endproc
 
-.proc ReadController
-  ; Initialize the output memory
-  LDA #1
-  STA $4016
-  LDA #0
-  STA $4016
+.proc update_player
+  PHP  ; Start by saving registers,
+  PHA  ; as usual.
+  TXA
+  PHA
+  TYA
+  PHA
 
-  ; Read the buttons from the data line
-  LDA $4016
-  AND #%10000001
-  STA controller_input
-
-  ; Check if the "Up" button is pressed
-  LDA controller_input
-  AND #%00010000
-  BEQ checkDown
-
-checkDown:
-  ; Check if the "Down" button is pressed
-  LDA controller_input
-  AND #%00100000
-  BEQ done
-
-done:
+  LDA pad1        ; Load button presses
+  AND #BTN_LEFT   ; Filter out all but Left
+  BEQ check_right ; If result is zero, left not pressed
+  JSR drawLeft
+  DEC player_x  ; If the branch is not taken, move player left
+check_right:
+  LDA pad1
+  AND #BTN_RIGHT
+  BEQ check_up
+  JSR drawRight
+  INC player_x
+check_up:
+  LDA pad1
+  AND #BTN_UP
+  BEQ check_down
+  JSR drawUp
+  DEC player_y
+check_down:
+  LDA pad1
+  AND #BTN_DOWN
+  BEQ done_checking
+  JSR drawDown
+  INC player_y
+done_checking:
+  PLA ; Done with updates, restore registers
+  TAY ; and return to where we called this
+  PLA
+  TAX
+  PLA
+  PLP
   RTS
 .endproc
 
