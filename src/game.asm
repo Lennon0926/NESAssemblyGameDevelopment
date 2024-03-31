@@ -101,12 +101,6 @@ forever:
   PHA
 
 ; Initialize player position
-  LDA #60  ; Set the initial Y position
-  STA player_y
-
-  LDA #130
-  STA player_x
-; Initialize player position
   INC animation_counter
   LDA animation_counter
   AND #$04      ; Update animation every 4 cycles
@@ -224,13 +218,6 @@ skip_animation:
   PHA
   TYA
   PHA
-
-; Initialize player position
-  LDA #60  ; Set the initial Y position
-  STA player2_y
-
-  LDA #80  ; Set the initial X position
-  STA player2_x
 
 ; Initialize player position
   INC animation_counter2
@@ -352,13 +339,6 @@ skip_animation:
   PHA
 
 ; Initialize player position
-  LDA #30  ; Set the initial Y position
-  STA player3_y
-
-  LDA #105  ; Set the initial X position
-  STA player3_x
-
-; Initialize player position
   INC animation_counter3
   LDA animation_counter3
   AND #$04      ; Update animation every 4 cycles
@@ -476,13 +456,6 @@ skip_animation:
   PHA
   TYA
   PHA
-
-; Initialize player position
-  LDA #90  ; Set the initial Y position
-  STA player4_y
-
-  LDA #105  ; Set the initial X position
-  STA player4_x
 
 ; Initialize player position
   INC animation_counter4
