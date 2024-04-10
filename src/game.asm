@@ -26,9 +26,6 @@ palettes:
 .byte $0F, $00, $00, $00
 .byte $0F, $00, $00, $00
 
-background:
-.incbin "background.nam"
-
 .segment "CHR"
 .incbin "sprites.chr"
 
@@ -37,7 +34,6 @@ background:
   RTI
 .endproc
 
-.import draw_background
 .import ReadController
 
 .proc nmi_handler
@@ -69,7 +65,6 @@ background:
   LDX #$00
   STX PPUADDR
 
-  JSR draw_background
 load_palettes:
   LDA palettes,X
   STA PPUDATA
@@ -180,10 +175,10 @@ drawRight:
   AND #$03          ; Update animation every 4 cycles
   BNE trampoline_right
   LDA frame_counter
-  AND #$0F          ; Mask out lower 4 bits
-  CMP #$05          ; Check which frame of animation to use
+  AND #$06          ; Mask out lower 4 bits
+  CMP #$02          ; Check which frame of animation to use
   BCC frame1Right   ; If less than 5, use the first frame
-  CMP #$0A          ; Check if it's the second or third frame
+  CMP #$04          ; Check if it's the second or third frame
   BCC frame2Right   ; If less than 10, use the second frame
   JMP frame3Right   ; Otherwise, use the third frame
 
@@ -302,10 +297,10 @@ drawLeft:
   AND #$03         ; Update animation every 4 cycles
   BNE trampoline_left
   LDA frame_counter
-  AND #$0F         ; Mask out lower 4 bits
-  CMP #$05         ; Check which frame of animation to use
+  AND #$06         ; Mask out lower 4 bits
+  CMP #$02         ; Check which frame of animation to use
   BCC frame1Left   ; If less than 5, use the first frame
-  CMP #$0A         ; Check if it's the second or third frame
+  CMP #$04         ; Check if it's the second or third frame
   BCC frame2Left   ; If less than 10, use the second frame
   JMP frame3Left   ; Otherwise, use the third frame
 
@@ -424,10 +419,10 @@ drawUp:
   AND #$03          ; Update animation every 4 cycles
   BNE trampoline_up
   LDA frame_counter
-  AND #$0F          ; Mask out lower 4 bits
-  CMP #$05          ; Check which frame of animation to use
+  AND #$06          ; Mask out lower 4 bits
+  CMP #$02          ; Check which frame of animation to use
   BCC frame1Up      ; If less than 5, use the first frame
-  CMP #$0A          ; Check if it's the second or third frame
+  CMP #$04          ; Check if it's the second or third frame
   BCC frame2Up      ; If less than 10, use the second frame
   JMP frame3Up      ; Otherwise, use the third frame
 
@@ -545,10 +540,10 @@ drawDown:
   AND #$03         ; Update animation every 4 cycles
   BNE trampoline_down
   LDA frame_counter
-  AND #$0F         ; Mask out lower 4 bits
-  CMP #$05         ; Check which frame of animation to use
+  AND #$06         ; Mask out lower 4 bits
+  CMP #$02         ; Check which frame of animation to use
   BCC frame1Down   ; If less than 5, use the first frame
-  CMP #$0A         ; Check if it's the second or third frame
+  CMP #$04         ; Check if it's the second or third frame
   BCC frame2Down   ; If less than 10, use the second frame
   JMP frame3Down   ; Otherwise, use the third frame
 
