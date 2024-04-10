@@ -16,7 +16,7 @@ animation_counter: .res 1
 
 .segment "RODATA"
 palettes:
-.byte $0F, $05, $16, $27 ; Bricks
+.byte $0F, $12, $23, $34 ; Neon
 .byte $0F, $0B, $1A, $29 ; Grass
 .byte $0F, $00, $10, $2D ; Gray scale
 .byte $0F, $09, $19, $3A
@@ -26,7 +26,8 @@ palettes:
 .byte $0F, $00, $00, $00
 .byte $0F, $00, $00, $00
 
-sprites:
+background:
+.incbin "background.nam"
 
 .segment "CHR"
 .incbin "sprites.chr"
@@ -36,6 +37,7 @@ sprites:
   RTI
 .endproc
 
+.import draw_background
 .import ReadController
 
 .proc nmi_handler
@@ -67,6 +69,7 @@ sprites:
   LDX #$00
   STX PPUADDR
 
+  JSR draw_background
 load_palettes:
   LDA palettes,X
   STA PPUDATA
@@ -76,12 +79,6 @@ load_palettes:
 
   ; write sprite data
   LDX #$00
-load_sprites:
-  LDA sprites,X
-  STA $0200,X
-  INX
-  CPX #$F0       ; # Sprites x 4 bytes
-  BNE load_sprites
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -94,6 +91,9 @@ vblankwait:       ; wait for another vblank before continuing
 
 forever:
   JMP forever
+.endproc
+
+.proc load_background
 .endproc
 
 .proc update_player
