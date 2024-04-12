@@ -349,7 +349,7 @@ setTile_right:
 
   ; write player ship tile attributes
   ; use palette 0
-  LDA #$00
+  LDA #$20
   STA $0202
   STA $0206
   STA $020a
@@ -471,7 +471,7 @@ setTile_left:
 
   ; write player ship tile attributes
   ; use palette 0
-  LDA #$00
+  LDA #$20
   STA $0202
   STA $0206
   STA $020a
@@ -593,7 +593,7 @@ setTile_up:
 
   ; write player ship tile attributes
   ; use palette 0
-  LDA #$00
+  LDA #$20
   STA $0202
   STA $0206
   STA $020a
@@ -715,7 +715,7 @@ setTile_down:
 
   ; write player ship tile attributes
   ; use palette 0
-  LDA #$00
+  LDA #$20
   STA $0202
   STA $0206
   STA $020a
