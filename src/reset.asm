@@ -2,6 +2,7 @@
 
 .segment "ZEROPAGE"
 .importzp player_x, player_y, frame_counter, animation_counter
+.importzp current_stage, scroll, ppuctrl_settings
 
 .segment "CODE"
 .import main
@@ -37,6 +38,8 @@ clear_oam:
 	STA player_x
 	LDA #$a0
 	STA player_y
+
+  
   
 vblankwait2:
   BIT PPUSTATUS
