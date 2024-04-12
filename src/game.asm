@@ -113,28 +113,28 @@ load_nametable_1:
   ldx #$00
   
 first_nametable_1:	
-  lda background, x 	; Load the hello message into SPR-RAM
+  lda nametable_1, x 	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00 
   bne first_nametable_1
   ldx $00
 second_nametable_1:
-  lda secondbackground, x	; Load the hello message into SPR-RAM
+  lda secondnametable_1, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
   bne second_nametable_1   
   ldx $00
 third_nametable_1:
-  lda thirdbackground, x	; Load the hello message into SPR-RAM
+  lda thirdnametable_1, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
   bne third_nametable_1 
   ldx $00
 fourth_nametable_1:
-  lda fourthbackground, x	; Load the hello message into SPR-RAM
+  lda fourthnametable_1, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
@@ -150,28 +150,28 @@ load_nametable_2:
   ldx #$00
   
 first_nametable_2:	
-  lda background, x 	; Load the hello message into SPR-RAM
+  lda nametable_2, x 	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00 
   bne first_nametable_2
   ldx $00
 second_nametable_2:
-  lda secondbackground, x	; Load the hello message into SPR-RAM
+  lda secondnametable_2, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
   bne second_nametable_2   
   ldx $00
 third_nametable_2:
-  lda thirdbackground, x	; Load the hello message into SPR-RAM
+  lda thirdnametable_2, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
   bne third_nametable_2 
   ldx $00
 fourth_nametable_2:
-  lda fourthbackground, x	; Load the hello message into SPR-RAM
+  lda fourthnametable_2, x	; Load the hello message into SPR-RAM
   sta PPUDATA
   inx
   cpx #$00
