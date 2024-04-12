@@ -60,24 +60,24 @@ palettes:
 	JSR update_player
   JSR drawSprites
 
-; 	LDA scroll
-; 	CMP #$00 ; did we scroll to the end of a nametable?
-; 	BNE set_scroll_positions
-; 	; if yes,
-; 	; Update base nametable
-; 	LDA ppuctrl_settings
-; 	EOR #%00000010 ; flip bit 1 to its opposite
-; 	STA ppuctrl_settings
-; 	STA PPUCTRL
-; 	LDA #240
-; 	STA scroll
+	LDA scroll
+  CMP #$F0 ; did we scroll to the end of a nametable?
+  BNE set_scroll_positions
+  ; if yes,
+  ; Update base nametable
+  LDA ppuctrl_settings
+  EOR #%00000010 ; flip bit 1 to its opposite
+  STA ppuctrl_settings
+  STA PPUCTRL
+  LDA #$00
+  STA scroll
 
-; set_scroll_positions:
-;   DEC scroll
-;   LDA scroll ; X scroll first
-;   STA PPUSCROLL
-;   LDA #$00 ; then Y scroll
-;   STA PPUSCROLL
+set_scroll_positions:
+  INC scroll
+  LDA scroll ; X scroll first
+  STA PPUSCROLL
+  LDA #$00 ; then Y scroll
+  STA PPUSCROLL
   RTI
 .endproc
 
@@ -85,7 +85,7 @@ palettes:
 
 .export main
 .proc main
-	LDA #239	 ; Y is only 240 lines tall!
+	LDA #00	 ; Y is only 240 lines tall!
 	STA scroll
   ; write a palette
   LDX PPUSTATUS
