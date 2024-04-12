@@ -9,6 +9,9 @@ pad1: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
 
+scroll: .res 1
+ppuctrl_settings: .res 1
+
 ; Indexes
 tileIndex: .res 1  ; Reserve 1 byte for the tile index
 megaIndex: .res 1  ; Reserve 1 byte for the mega index
@@ -139,8 +142,24 @@ fourthbackground:
 	JSR update_player
   JSR drawSprites
 
-  STA $2005
-  STA $2005
+; 	LDA scroll
+; 	CMP #$00 ; did we scroll to the end of a nametable?
+; 	BNE set_scroll_positions
+; 	; if yes,
+; 	; Update base nametable
+; 	LDA ppuctrl_settings
+; 	EOR #%00000010 ; flip bit 1 to its opposite
+; 	STA ppuctrl_settings
+; 	STA PPUCTRL
+; 	LDA #240
+; 	STA scroll
+
+; set_scroll_positions:
+;   DEC scroll
+;   LDA scroll ; X scroll first
+;   STA PPUSCROLL
+;   LDA #$00 ; then Y scroll
+;   STA PPUSCROLL
   RTI
 .endproc
 
@@ -148,6 +167,8 @@ fourthbackground:
 
 .export main
 .proc main
+	LDA #239	 ; Y is only 240 lines tall!
+	STA scroll
   ; write a palette
   LDX PPUSTATUS
   LDX #$3f
@@ -165,47 +186,87 @@ load_palettes:
   ; write sprite data
   LDX #$00
 
-LoadBackground:
-  LDA $2002
+load_nametable_1:
+  LDA PPUSTATUS
   LDA #$20
-  STA $2006
+  STA PPUADDR
   LDA #$00
-  STA $2006
+  STA PPUADDR
   ldx #$00
   
-Loop:	
+first_nametable_1:	
   lda background, x 	; Load the hello message into SPR-RAM
-  sta $2007
+  sta PPUDATA
   inx
   cpx #$00 
-  bne Loop
+  bne first_nametable_1
   ldx $00
-secondloop:
+second_nametable_1:
   lda secondbackground, x	; Load the hello message into SPR-RAM
-  sta $2007
+  sta PPUDATA
   inx
   cpx #$00
-  bne secondloop   
+  bne second_nametable_1   
   ldx $00
-thirdloop:
+third_nametable_1:
   lda thirdbackground, x	; Load the hello message into SPR-RAM
-  sta $2007
+  sta PPUDATA
   inx
   cpx #$00
-  bne thirdloop 
+  bne third_nametable_1 
   ldx $00
-fourthloop:
+fourth_nametable_1:
   lda fourthbackground, x	; Load the hello message into SPR-RAM
-  sta $2007
+  sta PPUDATA
   inx
   cpx #$00
-  bne fourthloop
+  bne fourth_nametable_1
+
+
+load_nametable_2:
+  LDA PPUSTATUS
+  LDA #$24
+  STA PPUADDR
+  LDA #$00
+  STA PPUADDR
+  ldx #$00
+  
+first_nametable_2:	
+  lda background, x 	; Load the hello message into SPR-RAM
+  sta PPUDATA
+  inx
+  cpx #$00 
+  bne first_nametable_2
+  ldx $00
+second_nametable_2:
+  lda secondbackground, x	; Load the hello message into SPR-RAM
+  sta PPUDATA
+  inx
+  cpx #$00
+  bne second_nametable_2   
+  ldx $00
+third_nametable_2:
+  lda thirdbackground, x	; Load the hello message into SPR-RAM
+  sta PPUDATA
+  inx
+  cpx #$00
+  bne third_nametable_2 
+  ldx $00
+fourth_nametable_2:
+  lda fourthbackground, x	; Load the hello message into SPR-RAM
+  sta PPUDATA
+  inx
+  cpx #$00
+  bne fourth_nametable_2
+
+
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
   BPL vblankwait
 
   LDA #%10010000  ; turn on NMIs, sprites use first pattern table
+	STA ppuctrl_settings
   STA PPUCTRL
   LDA #%00011110  ; turn on screen
   STA PPUMASK
