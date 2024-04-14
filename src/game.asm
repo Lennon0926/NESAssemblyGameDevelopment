@@ -127,6 +127,14 @@ load_palettes:
 
   ; Call the draw_tiles procedure
   JSR process_tiles
+
+  ; LDA #$00
+  ; STA nametable_address_low
+  ; LDA #$20
+  ; STA nametable_address_high
+
+  ; ; Call the draw_tiles procedure
+  ; JSR draw_background
   
 
 vblankwait:       ; wait for another vblank before continuing
@@ -158,15 +166,13 @@ forever:
   LDA #$55        ; Load the initial value into the accumulator
   LDY #$04        ; Initialize a counter for 4 loops
 process_loop:
-  ASL             ; Shift the accumulator left
-  ASL             ; Shift the accumulator left again to get the next two bits
-  ROL tile_number ; Rotate the accumulator to move the two bits to tile_number
+  AND #$03        ; Apply a mask to extract the two rightmost bits
+  STA tile_number ; Store the result in tile_number
   JSR draw_tiles  ; Call the draw_tiles subroutine
   DEY             ; Decrement the loop counter
   BNE process_loop; If counter is not zero, continue looping
   RTS             ; Return from the subroutine
 .endproc
-
 
 .proc draw_tiles
   ; Save registers
@@ -187,7 +193,7 @@ process_loop:
   STA PPUDATA
   STA PPUDATA
   
-    ; Load nametable address from parameter
+  ; Load nametable address from parameter
   LDA nametable_address_high
   STA PPUADDR
 ; LOW BYTE FOR LEFT
