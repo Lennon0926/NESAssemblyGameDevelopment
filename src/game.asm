@@ -186,21 +186,14 @@ process_loop:
   LDA tile_number
   STA PPUDATA
   STA PPUDATA
-
-  ; ; Load the current low address into a register
-  LDA nametable_address_low
-
-  ; Add 20 (32 in decimal) to it
-  CLC
-  ADC #$20
-
-  ; Store the result back into the low address
-  STA nametable_address_low
   
     ; Load nametable address from parameter
   LDA nametable_address_high
   STA PPUADDR
+; LOW BYTE FOR LEFT
   LDA nametable_address_low
+  CLC 
+  ADC #$20 ; an overflow will occur BUT, the accumulator will contain the correct value for the low byte
   STA PPUADDR
 
   LDA tile_number
