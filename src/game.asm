@@ -63,28 +63,28 @@ palettes:
 	JSR update_player
   JSR drawSprites
 
-;   LDA scroll
-;   CMP #$FF ; did we scroll to the end of a nametable?
-;   BNE set_scroll_positions
-;   ; if yes,
-;   ; Reset scroll to the beginning
-;   LDA #$00
-;   STA scroll
+  LDA scroll
+  CMP #$FF ; did we scroll to the end of a nametable?
+  BNE set_scroll_positions
+  ; if yes,
+  ; Reset scroll to the beginning
+  LDA #$00
+  STA scroll
 
-; set_scroll_positions:
-;   ; delay loop for slowing down the scroll
-;   LDX #$00
-; delay_loop:
-;   DEX
-;   BNE delay_loop
+set_scroll_positions:
+  ; delay loop for slowing down the scroll
+  LDX #$00
+delay_loop:
+  DEX
+  BNE delay_loop
 
-;   INC scroll
-;   LDA scroll ; X scroll first
-;   STA PPUSCROLL
+  INC scroll
+  LDA scroll ; X scroll first
+  STA PPUSCROLL
 
-;   ; Y scroll position remains constant
-;   LDA #$00
-;   STA PPUSCROLL
+  ; Y scroll position remains constant
+  LDA #$00
+  STA PPUSCROLL
   RTI
 .endproc
 
@@ -116,9 +116,8 @@ load_palettes:
 
   ; Call the draw_tiles procedure
   LDA #$01
+
   STA tile_index
-  JSR draw_tiles
-  JSR draw_tiles
     JSR draw_tiles
   JSR draw_tiles
     JSR draw_tiles
@@ -134,9 +133,8 @@ load_palettes:
     JSR draw_tiles
   JSR draw_tiles
     JSR draw_tiles
-
-
-  
+  JSR draw_tiles
+    JSR draw_tiles
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -201,9 +199,17 @@ process_loop:
   STA PPUDATA
   STA PPUDATA
 
+    ; Increment nametable_address_low by 2
   LDA nametable_address_low
-  CLC 
-  ADC #$02 
+  CLC
+  ADC #$02
+  BCC no_overflow
+  ; If overflow, add 32 to nametable_address_high
+  LDA nametable_address_high
+  CLC
+  ADC #$20
+  STA nametable_address_high
+no_overflow:
   STA nametable_address_low
 
   RTS
