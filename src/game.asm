@@ -115,7 +115,28 @@ load_palettes:
   STA nametable_address_high
 
   ; Call the draw_tiles procedure
-  JSR process_tiles
+  LDA #$01
+  STA tile_index
+  JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+  JSR draw_tiles
+    JSR draw_tiles
+
+
+  
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -143,7 +164,7 @@ forever:
 ; .endproc
 
 .proc process_tiles
-  LDA #$B4        ; Load the initial value into the accumulator
+  LDA #$55        ; Load the initial value into the accumulator
   LDY #$04        ; Initialize a counter for 4 loops
 process_loop:
   AND #$03        ; Apply a mask to extract the two rightmost bits
@@ -157,14 +178,6 @@ process_loop:
 .endproc
 
 .proc draw_tiles
-  ; Save registers
-  PHP
-  PHA
-  TXA
-  PHA
-  TYA
-  PHA
-
   ; Load nametable address from parameter
   LDA nametable_address_high
   STA PPUADDR
@@ -189,19 +202,10 @@ process_loop:
   STA PPUDATA
 
   LDA nametable_address_low
-  ; Move to the next tile horizontally
-  CLC
-  LDA nametable_address_low
-  ADC #2
+  CLC 
+  ADC #$02 
   STA nametable_address_low
 
-  ; Restore registers and return
-  PLA
-  TAY
-  PLA
-  TAX
-  PLA
-  PLP
   RTS
 .endproc
 
