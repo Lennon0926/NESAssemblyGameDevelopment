@@ -14,7 +14,7 @@ current_stage: .res 1  ; Reserve 1 byte for the current stage
 scroll: .res 1
 ppuctrl_settings: .res 1
 
-tile_number: .res 1
+tile_index: .res 1
 nametable_address_high: .res 1
 nametable_address_low: .res 1
 
@@ -109,17 +109,6 @@ load_palettes:
   CPX #$20       ; # Palettes x 4 bytes
   BNE load_palettes
 
-  ; LDA #$01
-  ; STA tile_number
-  ; ; Set the nametable address
-  ; LDA #$00
-  ; STA nametable_address_low
-  ; LDA #$20
-  ; STA nametable_address_high
-
-  ; ; Call the draw_tiles procedure
-  ; JSR draw_tiles
-
   LDA #$00
   STA nametable_address_low
   LDA #$20
@@ -127,15 +116,6 @@ load_palettes:
 
   ; Call the draw_tiles procedure
   JSR process_tiles
-
-  ; LDA #$00
-  ; STA nametable_address_low
-  ; LDA #$20
-  ; STA nametable_address_high
-
-  ; ; Call the draw_tiles procedure
-  ; JSR draw_background
-  
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -163,12 +143,14 @@ forever:
 ; .endproc
 
 .proc process_tiles
-  LDA #$55        ; Load the initial value into the accumulator
+  LDA #$B4        ; Load the initial value into the accumulator
   LDY #$04        ; Initialize a counter for 4 loops
 process_loop:
   AND #$03        ; Apply a mask to extract the two rightmost bits
-  STA tile_number ; Store the result in tile_number
+  STA tile_index ; Store the result in tile_index
   JSR draw_tiles  ; Call the draw_tiles subroutine
+  LSR             ; Shift the accumulator right by one bit
+  LSR             ; Shift the accumulator right by one more bit
   DEY             ; Decrement the loop counter
   BNE process_loop; If counter is not zero, continue looping
   RTS             ; Return from the subroutine
@@ -189,7 +171,7 @@ process_loop:
   LDA nametable_address_low
   STA PPUADDR
 
-  LDA tile_number
+  LDA tile_index
   STA PPUDATA
   STA PPUDATA
   
@@ -202,28 +184,16 @@ process_loop:
   ADC #$20 ; an overflow will occur BUT, the accumulator will contain the correct value for the low byte
   STA PPUADDR
 
-  LDA tile_number
+  LDA tile_index
   STA PPUDATA
   STA PPUDATA
 
-;   ; Check overflow in low byte
   LDA nametable_address_low
+  ; Move to the next tile horizontally
   CLC
-  ADC #$02
-  BCC no_overflow
-  ; Overflow occurred, sum 32
   LDA nametable_address_low
-  CLC
-  ADC #$20
+  ADC #2
   STA nametable_address_low
-  JMP continue_draw_tiles
-no_overflow:
-  ; No overflow, sum 2
-  LDA nametable_address_low
-  CLC
-  ADC #$02
-  STA nametable_address_low
-continue_draw_tiles:
 
   ; Restore registers and return
   PLA
