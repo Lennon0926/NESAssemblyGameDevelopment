@@ -63,28 +63,28 @@ palettes:
 	JSR update_player
   JSR drawSprites
 
-  LDA scroll
-  CMP #$FF ; did we scroll to the end of a nametable?
-  BNE set_scroll_positions
-  ; if yes,
-  ; Reset scroll to the beginning
-  LDA #$00
-  STA scroll
+;   LDA scroll
+;   CMP #$FF ; did we scroll to the end of a nametable?
+;   BNE set_scroll_positions
+;   ; if yes,
+;   ; Reset scroll to the beginning
+;   LDA #$00
+;   STA scroll
 
-set_scroll_positions:
-  ; delay loop for slowing down the scroll
-  LDX #$00
-delay_loop:
-  DEX
-  BNE delay_loop
+; set_scroll_positions:
+;   ; delay loop for slowing down the scroll
+;   LDX #$00
+; delay_loop:
+;   DEX
+;   BNE delay_loop
 
-  INC scroll
-  LDA scroll ; X scroll first
-  STA PPUSCROLL
+;   INC scroll
+;   LDA scroll ; X scroll first
+;   STA PPUSCROLL
 
-  ; Y scroll position remains constant
-  LDA #$00
-  STA PPUSCROLL
+;   ; Y scroll position remains constant
+;   LDA #$00
+;   STA PPUSCROLL
   RTI
 .endproc
 
@@ -163,16 +163,22 @@ forever:
 ; .endproc
 
 .proc process_tiles
-  LDA #$55        ; Load the initial value into the accumulator
+  LDA #$B4        ; Load the initial value into the accumulator
+  PHA             ; Push the accumulator onto the stack
   LDY #$04        ; Initialize a counter for 4 loops
 process_loop:
+  PLA             ; Pull the original value off the stack
+  PHA             ; Push it back onto the stack for the next iteration
   AND #$03        ; Apply a mask to extract the two rightmost bits
   STA tile_index ; Store the result in tile_index
   JSR draw_tiles  ; Call the draw_tiles subroutine
+  PLA             ; Pull the original value off the stack
+  PHA             ; Push it back onto the stack for the next iteration
   LSR             ; Shift the accumulator right by one bit
   LSR             ; Shift the accumulator right by one more bit
   DEY             ; Decrement the loop counter
   BNE process_loop; If counter is not zero, continue looping
+  PLA             ; Pull the original value off the stack
   RTS             ; Return from the subroutine
 .endproc
 
@@ -215,6 +221,7 @@ no_overflow:
 
   RTS
 .endproc
+
 
 .proc update_player
   PHP  ; Start by saving registers,
