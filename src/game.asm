@@ -114,27 +114,28 @@ load_palettes:
   LDA #$20
   STA nametable_address_high
 
-  ; Call the draw_tiles procedure
-  LDA #$01
+  JSR process_tiles
+  ; ; Call the draw_tiles procedure
+  ; LDA #$01
 
-  STA tile_index
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
-  JSR draw_tiles
-    JSR draw_tiles
+  ; STA tile_index
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
+  ; JSR draw_tiles
+  ;   JSR draw_tiles
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -192,22 +193,22 @@ process_loop:
 ; LOW BYTE FOR LEFT
   LDA nametable_address_low
   CLC 
-  ADC #$20 ; an overflow will occur BUT, the accumulator will contain the correct value for the low byte
+  ADC #$20
   STA PPUADDR
 
   LDA tile_index
   STA PPUDATA
   STA PPUDATA
 
-    ; Increment nametable_address_low by 2
+  ; Increment nametable_address_low by 2
   LDA nametable_address_low
   CLC
   ADC #$02
   BCC no_overflow
-  ; If overflow, add 32 to nametable_address_high
+  ; If overflow, add 1 to nametable_address_high
   LDA nametable_address_high
   CLC
-  ADC #$20
+  ADC #$01
   STA nametable_address_high
 no_overflow:
   STA nametable_address_low
