@@ -15,6 +15,7 @@ scroll: .res 1
 ppuctrl_settings: .res 1
 
 tile_index: .res 1
+tile_bit: .res 1
 nametable_address_high: .res 1
 nametable_address_low: .res 1
 
@@ -163,24 +164,24 @@ forever:
 ; .endproc
 
 .proc process_tiles
-  LDA #$B4        ; Load the initial value into the accumulator
-  PHA             ; Push the accumulator onto the stack
+  LDA #$B7        ; Load the initial value into the accumulator
+  STA tile_bit    ; Store the initial value in tile_bit
   LDY #$04        ; Initialize a counter for 4 loops
 process_loop:
-  PLA             ; Pull the original value off the stack
-  PHA             ; Push it back onto the stack for the next iteration
+  PHA             ; Push the accumulator onto the stack
   AND #$03        ; Apply a mask to extract the two rightmost bits
-  STA tile_index ; Store the result in tile_index
+  STA tile_index  ; Store the result in tile_index
   JSR draw_tiles  ; Call the draw_tiles subroutine
   PLA             ; Pull the original value off the stack
-  PHA             ; Push it back onto the stack for the next iteration
   LSR             ; Shift the accumulator right by one bit
   LSR             ; Shift the accumulator right by one more bit
+  STA tile_bit    ; Store the shifted value in tile_bit
   DEY             ; Decrement the loop counter
   BNE process_loop; If counter is not zero, continue looping
-  PLA             ; Pull the original value off the stack
   RTS             ; Return from the subroutine
 .endproc
+
+
 
 .proc draw_tiles
   ; Load nametable address from parameter
