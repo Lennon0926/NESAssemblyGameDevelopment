@@ -19,6 +19,10 @@ tile_bit: .res 1
 nametable_address_high: .res 1
 nametable_address_low: .res 1
 
+tiles_processed: .res 1 ; Reserve 1 byte to count the number of tiles processed
+draw_counter: .res 1
+
+
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
 .exportzp current_stage, scroll, ppuctrl_settings
 
@@ -116,27 +120,23 @@ load_palettes:
   STA nametable_address_high
 
   JSR process_tiles
-  ; ; Call the draw_tiles procedure
-  ; LDA #$01
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
 
-  ; STA tile_index
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
-  ; JSR draw_tiles
-  ;   JSR draw_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -154,9 +154,10 @@ forever:
 
 ; -------------------------Subroutines-------------------------
 ; .proc draw_background
-;   LDX #$0F  ; Initialize counter to the size of the data
+;   LDX #$3C  ; Initialize counter to the size of the data
 ; loop:
 ;   LDA S1_nametable_1, X  ; Load a byte from the data into the accumulator
+;   STA tile_bit
 ;   JSR process_tiles  ; Call process_tiles with the value in the accumulator
 ;   DEX  ; Decrement the counter
 ;   BNE loop  ; If the counter is not zero, go back to the start of the loop
@@ -164,9 +165,10 @@ forever:
 ; .endproc
 
 .proc process_tiles
-  LDA #$B7        ; Load the initial value into the accumulator
-  STA tile_bit    ; Store the initial value in tile_bit
+  LDA #$B4
+  STA tile_bit
   LDY #$04        ; Initialize a counter for 4 loops
+  STA draw_counter
 process_loop:
   PHA             ; Push the accumulator onto the stack
   AND #$03        ; Apply a mask to extract the two rightmost bits
@@ -177,7 +179,12 @@ process_loop:
   LSR             ; Shift the accumulator right by one more bit
   STA tile_bit    ; Store the shifted value in tile_bit
   DEY             ; Decrement the loop counter
+  STA draw_counter
   BNE process_loop; If counter is not zero, continue looping
+
+  ; Increment the counter for tiles processed
+  INC tiles_processed
+
   RTS             ; Return from the subroutine
 .endproc
 
@@ -207,21 +214,32 @@ process_loop:
   STA PPUDATA
   STA PPUDATA
 
-  ; Increment nametable_address_low by 2
+  LDA tiles_processed
+  AND #$03  ; Mask out all but the two least significant bits
+  CMP #$03  ; Check if tiles_processed is 3 (which means it's a multiple of 4)
+  BNE not_multiple_of_4
+
+  LDA draw_counter
+  AND #$03  ; Mask out all but the two least significant bits
+  CMP #$03  ; Check if draw_counter is 3 (which means it's a multiple of 4)
+  BNE not_multiple_of_4
+  
   LDA nametable_address_low
   CLC
-  ADC #$02
-  BCC no_overflow
-  ; If overflow, add 1 to nametable_address_high
-  LDA nametable_address_high
+  ADC #$22        ; Add 34 to nametable_address_low
+  STA nametable_address_low
+  JMP done
+
+not_multiple_of_4:
+  LDA nametable_address_low
   CLC
-  ADC #$01
-  STA nametable_address_high
-no_overflow:
+  ADC #$02        ; Add 2 to nametable_address_low
   STA nametable_address_low
 
+done:
   RTS
 .endproc
+
 
 
 .proc update_player

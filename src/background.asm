@@ -31,7 +31,6 @@ S1_nametable_2:
     .byte $75,$40,$14,$1e
     .byte $00,$05,$3c,$00
     .byte $aa,$aa,$aa,$aa
-
 ; Stage Two:
 S2_nametable_1:
 
