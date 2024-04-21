@@ -9,7 +9,7 @@ pad1: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
 
-current_stage: .res 1  ; Reserve 1 byte for the current stage
+current_nametable: .res 1  ; Reserve 1 byte for the current stage
 
 scroll: .res 1
 ppuctrl_settings: .res 1
@@ -120,6 +120,47 @@ load_palettes:
   STA nametable_address_low
   LDA #$20
   STA nametable_address_high
+  LDA #$00
+  STA current_nametable
+  JSR draw_background
+
+  ; LDA #$00
+  ; STA nametable_address_low
+  ; LDA #$24
+  ; STA nametable_address_high
+  ; LDA #$01
+  ; STA current_nametable
+  ; JSR draw_background
+
+vblankwait:       ; wait for another vblank before continuing
+  BIT PPUSTATUS
+  BPL vblankwait
+
+  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
+  STA ppuctrl_settings
+  STA PPUCTRL
+  LDA #%00011110  ; turn on screen
+  STA PPUMASK
+
+forever:
+  JMP forever
+.endproc
+
+; -------------------------Subroutines-------------------------
+.proc draw_background
+  PHP  ; Start by saving registers,
+  PHA  ; as usual.
+  TXA
+  PHA
+  TYA
+  PHA
+
+  LDA current_nametable
+  BEQ S1_nametable_1
+
+  LDA current_nametable
+  CMP #$01
+  BEQ S1_nametable_2 
 
 S1_nametable_1:
     LDA #$00
@@ -146,136 +187,91 @@ S1_nametable_1:
     LDA #$aa
     STA tile_bit
     JSR process_tiles
-    LDA #$b4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$17
-    STA tile_bit
-    JSR process_tiles
-    LDA #$51
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$b4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$17
-    STA tile_bit
-    JSR process_tiles
-    LDA #$53
-    STA tile_bit
-    JSR process_tiles
-    LDA #$f4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$bc
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$01
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$95
-    STA tile_bit
-    JSR process_tiles
-    LDA #$44
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$80
-    STA tile_bit
-    JSR process_tiles
-    LDA #$45
-    STA tile_bit
-    JSR process_tiles
-    LDA #$d5
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$94
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$fd
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3c
-    STA tile_bit
-    JSR process_tiles
-    LDA #$80
-    STA tile_bit
-    JSR process_tiles
-    LDA #$5d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$5d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$34
-    STA tile_bit
-    JSR process_tiles
-    LDA #$b4
+    LDA #$12
     STA tile_bit
     JSR process_tiles
     LDA #$3f
     STA tile_bit
     JSR process_tiles
-    LDA #$01
+    LDA #$3d
     STA tile_bit
     JSR process_tiles
-    LDA #$04
+    LDA #$54
     STA tile_bit
     JSR process_tiles
-    LDA #$b4
+    LDA #$1e
+    STA tile_bit
+    JSR process_tiles
+    LDA #$15
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3E
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
     STA tile_bit
     JSR process_tiles
     LDA #$55
     STA tile_bit
     JSR process_tiles
-    LDA #$11
+    LDA #$15
     STA tile_bit
     JSR process_tiles
-    LDA #$04
-    STA tile_bit
-    JSR process_tiles
-    LDA #$b4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7f
+    LDA #$56
     STA tile_bit
     JSR process_tiles
     LDA #$11
     STA tile_bit
     JSR process_tiles
-    LDA #$04
+    LDA #$00
     STA tile_bit
     JSR process_tiles
-    LDA #$94
+    LDA #$00
     STA tile_bit
     JSR process_tiles
-    LDA #$75
+    LDA #$02
     STA tile_bit
     JSR process_tiles
-    LDA #$5f
+    LDA #$51
     STA tile_bit
     JSR process_tiles
-    LDA #$d5
+    LDA #$57
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$16
+    STA tile_bit
+    JSR process_tiles
+    LDA #$41
+    STA tile_bit
+    JSR process_tiles
+    LDA #$4f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3e
+    STA tile_bit
+    JSR process_tiles
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$1e
     STA tile_bit
     JSR process_tiles
     LDA #$00
@@ -284,7 +280,52 @@ S1_nametable_1:
     LDA #$40
     STA tile_bit
     JSR process_tiles
-    LDA #$0d
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$12
+    STA tile_bit
+    JSR process_tiles
+    LDA #$55
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$12
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fd
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$16
+    STA tile_bit
+    JSR process_tiles
+    LDA #$5d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$05
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fd
+    STA tile_bit
+    JSR process_tiles
+    LDA #$4f
     STA tile_bit
     JSR process_tiles
     LDA #$ff
@@ -302,34 +343,21 @@ S1_nametable_1:
     LDA #$aa
     STA tile_bit
     JSR process_tiles
+JMP done
 
+S1_nametable_2:
 
-vblankwait:       ; wait for another vblank before continuing
-  BIT PPUSTATUS
-  BPL vblankwait
+JMP done
 
-  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
-  STA ppuctrl_settings
-  STA PPUCTRL
-  LDA #%00011110  ; turn on screen
-  STA PPUMASK
-
-forever:
-  JMP forever
+done:
+  PLA ; Done with updates, restore registers
+  TAY ; and return to where we called this
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
 .endproc
-
-; -------------------------Subroutines-------------------------
-; .proc draw_background
-;   LDX #$00  ; Initialize counter to 0
-; loop:
-;   LDA S1_nametable_1, X  ; Load a byte from the data into the accumulator
-;   STA tile_bit
-;   JSR process_tiles  ; Call process_tiles with the value in the accumulator
-;   INX  ; Increment the counter
-;   CPX #$3C  ; Check if the counter is equal to the size of the data
-;   BNE loop  ; If not, continue the loop
-;   RTS  ; Return from subroutine
-; .endproc
 
 .proc process_tiles
   LDA tile_bit
