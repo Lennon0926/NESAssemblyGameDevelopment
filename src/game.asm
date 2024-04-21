@@ -26,7 +26,7 @@ row_counter: .res 1
 
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
-.exportzp current_stage, scroll, ppuctrl_settings
+.exportzp current_nametable, scroll, ppuctrl_settings
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -160,7 +160,10 @@ forever:
 
   LDA current_nametable
   CMP #$01
-  BEQ S1_nametable_2 
+  BEQ jump_to_S1_nametable_2
+   
+jump_to_S1_nametable_2:
+  JMP S1_nametable_2
 
 S1_nametable_1:
     LDA #$00
@@ -346,7 +349,186 @@ S1_nametable_1:
 JMP done
 
 S1_nametable_2:
-
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00 
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$12
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$1e
+    STA tile_bit
+    JSR process_tiles
+    LDA #$15
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3E
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$55
+    STA tile_bit
+    JSR process_tiles
+    LDA #$15
+    STA tile_bit
+    JSR process_tiles
+    LDA #$56
+    STA tile_bit
+    JSR process_tiles
+    LDA #$11
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$02
+    STA tile_bit
+    JSR process_tiles
+    LDA #$51
+    STA tile_bit
+    JSR process_tiles
+    LDA #$57
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$16
+    STA tile_bit
+    JSR process_tiles
+    LDA #$41
+    STA tile_bit
+    JSR process_tiles
+    LDA #$4f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3e
+    STA tile_bit
+    JSR process_tiles
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$1e
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$40
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$12
+    STA tile_bit
+    JSR process_tiles
+    LDA #$55
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$12
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fd
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$10
+    STA tile_bit
+    JSR process_tiles
+    LDA #$16
+    STA tile_bit
+    JSR process_tiles
+    LDA #$5d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$05
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fd
+    STA tile_bit
+    JSR process_tiles
+    LDA #$4f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$ff
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
 JMP done
 
 done:
