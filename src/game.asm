@@ -9,7 +9,8 @@ pad1: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
 
-current_nametable: .res 1  ; Reserve 1 byte for the current stage
+current_nametable: .res 1  ; Reserve 1 byte for the current nametable
+current_stage: .res 1
 
 scroll: .res 1
 ppuctrl_settings: .res 1
@@ -26,7 +27,7 @@ row_counter: .res 1
 
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
-.exportzp current_nametable, scroll, ppuctrl_settings
+.exportzp current_nametable, current_stage, scroll, ppuctrl_settings
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -161,7 +162,7 @@ forever:
   LDA current_nametable
   CMP #$01
   BEQ jump_to_S1_nametable_2
-   
+
 jump_to_S1_nametable_2:
   JMP S1_nametable_2
 
