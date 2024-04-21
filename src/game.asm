@@ -125,13 +125,13 @@ load_palettes:
   STA current_nametable
   JSR draw_background
 
-  ; LDA #$00
-  ; STA nametable_address_low
-  ; LDA #$24
-  ; STA nametable_address_high
-  ; LDA #$01
-  ; STA current_nametable
-  ; JSR draw_background
+  LDA #$00
+  STA nametable_address_low
+  LDA #$24
+  STA nametable_address_high
+  LDA #$01
+  STA current_nametable
+  JSR draw_background
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -160,7 +160,7 @@ forever:
   BEQ S1_nametable_1
 
   LDA current_nametable
-  CMP #$01
+  CMP #$00
   BEQ jump_to_S1_nametable_2
 
 jump_to_S1_nametable_2:
@@ -374,148 +374,148 @@ S1_nametable_2:
     LDA #$aa
     STA tile_bit
     JSR process_tiles
-    LDA #$12
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$1e
-    STA tile_bit
-    JSR process_tiles
     LDA #$15
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7c
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fc
+    STA tile_bit
+    JSR process_tiles
+    LDA #$84
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
     STA tile_bit
     JSR process_tiles
     LDA #$7d
     STA tile_bit
     JSR process_tiles
-    LDA #$00
+    LDA #$54
     STA tile_bit
     JSR process_tiles
-    LDA #$3E
+    LDA #$b4
     STA tile_bit
     JSR process_tiles
-    LDA #$00
+    LDA #$54
     STA tile_bit
     JSR process_tiles
     LDA #$55
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$bc
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$95
     STA tile_bit
     JSR process_tiles
     LDA #$15
     STA tile_bit
     JSR process_tiles
-    LDA #$56
+    LDA #$d5
     STA tile_bit
     JSR process_tiles
-    LDA #$11
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$80
     STA tile_bit
     JSR process_tiles
     LDA #$00
     STA tile_bit
     JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$02
-    STA tile_bit
-    JSR process_tiles
-    LDA #$51
-    STA tile_bit
-    JSR process_tiles
-    LDA #$57
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$16
+    LDA #$f1
     STA tile_bit
     JSR process_tiles
     LDA #$41
     STA tile_bit
     JSR process_tiles
-    LDA #$4f
+    LDA #$94
+    STA tile_bit
+    JSR process_tiles
+    LDA #$04
+    STA tile_bit
+    JSR process_tiles
+    LDA #$51
+    STA tile_bit
+    JSR process_tiles
+    LDA #$51
+    STA tile_bit
+    JSR process_tiles
+    LDA #$bc
+    STA tile_bit
+    JSR process_tiles
+    LDA #$04
+    STA tile_bit
+    JSR process_tiles
+    LDA #$01
     STA tile_bit
     JSR process_tiles
     LDA #$00
     STA tile_bit
     JSR process_tiles
-    LDA #$3e
+    LDA #$b4
     STA tile_bit
     JSR process_tiles
-    LDA #$45
+    LDA #$04
     STA tile_bit
     JSR process_tiles
-    LDA #$45
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$1e
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$40
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$12
+    LDA #$11
     STA tile_bit
     JSR process_tiles
     LDA #$55
     STA tile_bit
     JSR process_tiles
-    LDA #$44
+    LDA #$84
     STA tile_bit
     JSR process_tiles
-    LDA #$10
+    LDA #$04
     STA tile_bit
     JSR process_tiles
-    LDA #$12
+    LDA #$11
     STA tile_bit
     JSR process_tiles
-    LDA #$fd
+    LDA #$7f
     STA tile_bit
     JSR process_tiles
-    LDA #$44
+    LDA #$84
     STA tile_bit
     JSR process_tiles
-    LDA #$10
+    LDA #$15
     STA tile_bit
     JSR process_tiles
-    LDA #$16
+    LDA #$50
     STA tile_bit
     JSR process_tiles
-    LDA #$5d
+    LDA #$75
     STA tile_bit
     JSR process_tiles
-    LDA #$05
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$fd
-    STA tile_bit
-    JSR process_tiles
-    LDA #$4f
+    LDA #$94
     STA tile_bit
     JSR process_tiles
     LDA #$ff
+    STA tile_bit
+    JSR process_tiles
+    LDA #$f1
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
     STA tile_bit
     JSR process_tiles
     LDA #$aa
