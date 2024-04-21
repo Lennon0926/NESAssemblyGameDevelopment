@@ -121,85 +121,187 @@ load_palettes:
   LDA #$20
   STA nametable_address_high
 
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
-  JSR process_tiles
+S1_nametable_1:
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00 
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$b4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$17
+    STA tile_bit
+    JSR process_tiles
+    LDA #$51
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$b4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$17
+    STA tile_bit
+    JSR process_tiles
+    LDA #$53
+    STA tile_bit
+    JSR process_tiles
+    LDA #$f4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$bc
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$01
+    STA tile_bit
+    JSR process_tiles
+    LDA #$54
+    STA tile_bit
+    JSR process_tiles
+    LDA #$95
+    STA tile_bit
+    JSR process_tiles
+    LDA #$44
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$80
+    STA tile_bit
+    JSR process_tiles
+    LDA #$45
+    STA tile_bit
+    JSR process_tiles
+    LDA #$d5
+    STA tile_bit
+    JSR process_tiles
+    LDA #$15
+    STA tile_bit
+    JSR process_tiles
+    LDA #$94
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$fd
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3c
+    STA tile_bit
+    JSR process_tiles
+    LDA #$80
+    STA tile_bit
+    JSR process_tiles
+    LDA #$5d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$5d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$34
+    STA tile_bit
+    JSR process_tiles
+    LDA #$b4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$3f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$01
+    STA tile_bit
+    JSR process_tiles
+    LDA #$04
+    STA tile_bit
+    JSR process_tiles
+    LDA #$b4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$55
+    STA tile_bit
+    JSR process_tiles
+    LDA #$11
+    STA tile_bit
+    JSR process_tiles
+    LDA #$04
+    STA tile_bit
+    JSR process_tiles
+    LDA #$b4
+    STA tile_bit
+    JSR process_tiles
+    LDA #$7f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$11
+    STA tile_bit
+    JSR process_tiles
+    LDA #$04
+    STA tile_bit
+    JSR process_tiles
+    LDA #$94
+    STA tile_bit
+    JSR process_tiles
+    LDA #$75
+    STA tile_bit
+    JSR process_tiles
+    LDA #$5f
+    STA tile_bit
+    JSR process_tiles
+    LDA #$d5
+    STA tile_bit
+    JSR process_tiles
+    LDA #$00
+    STA tile_bit
+    JSR process_tiles
+    LDA #$40
+    STA tile_bit
+    JSR process_tiles
+    LDA #$0d
+    STA tile_bit
+    JSR process_tiles
+    LDA #$ff
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
+    LDA #$aa
+    STA tile_bit
+    JSR process_tiles
 
 
 vblankwait:       ; wait for another vblank before continuing
@@ -218,19 +320,19 @@ forever:
 
 ; -------------------------Subroutines-------------------------
 ; .proc draw_background
-;   LDX #$3C  ; Initialize counter to the size of the data
+;   LDX #$00  ; Initialize counter to 0
 ; loop:
 ;   LDA S1_nametable_1, X  ; Load a byte from the data into the accumulator
 ;   STA tile_bit
 ;   JSR process_tiles  ; Call process_tiles with the value in the accumulator
-;   DEX  ; Decrement the counter
-;   BNE loop  ; If the counter is not zero, go back to the start of the loop
+;   INX  ; Increment the counter
+;   CPX #$3C  ; Check if the counter is equal to the size of the data
+;   BNE loop  ; If not, continue the loop
 ;   RTS  ; Return from subroutine
 ; .endproc
 
 .proc process_tiles
-  LDA #$B4
-  STA tile_bit
+  LDA tile_bit
   LDY #$04        ; Initialize a counter for 4 loops
   STA draw_counter
 process_loop:
