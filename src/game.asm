@@ -21,6 +21,7 @@ nametable_address_low: .res 1
 
 tiles_processed: .res 1 ; Reserve 1 byte to count the number of tiles processed
 draw_counter: .res 1
+megatile_counter: .res 1
 
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
@@ -214,29 +215,26 @@ process_loop:
   STA PPUDATA
   STA PPUDATA
 
-  LDA tiles_processed
-  AND #$03  ; Mask out all but the two least significant bits
-  CMP #$03  ; Check if tiles_processed is 3 (which means it's a multiple of 4)
-  BNE not_multiple_of_4
+  INC megatile_counter
 
-  LDA draw_counter
-  AND #$03  ; Mask out all but the two least significant bits
-  CMP #$03  ; Check if draw_counter is 3 (which means it's a multiple of 4)
-  BNE not_multiple_of_4
-  
+  ; Add 2 to nametable_address_low
   LDA nametable_address_low
   CLC
-  ADC #$22        ; Add 34 to nametable_address_low
+  ADC #$02
   STA nametable_address_low
-  JMP done
 
-not_multiple_of_4:
+; Check if we've reached the end of the row
+  LDA megatile_counter
+  CMP #$10
+  BNE not_end_of_row
+  ; Move to the next row
   LDA nametable_address_low
   CLC
-  ADC #$02        ; Add 2 to nametable_address_low
+  ADC #$20
   STA nametable_address_low
-
-done:
+  LDX #$00
+  STX megatile_counter
+not_end_of_row:
   RTS
 .endproc
 
