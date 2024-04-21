@@ -22,6 +22,7 @@ nametable_address_low: .res 1
 tiles_processed: .res 1 ; Reserve 1 byte to count the number of tiles processed
 draw_counter: .res 1
 megatile_counter: .res 1
+row_counter: .res 1
 
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
@@ -138,6 +139,68 @@ load_palettes:
   JSR process_tiles
   JSR process_tiles
   JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+  JSR process_tiles
+
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -215,15 +278,15 @@ process_loop:
   STA PPUDATA
   STA PPUDATA
 
-  INC megatile_counter
-
   ; Add 2 to nametable_address_low
   LDA nametable_address_low
   CLC
   ADC #$02
   STA nametable_address_low
 
-; Check if we've reached the end of the row
+  INC megatile_counter
+
+  ; Check if we've reached the end of the row
   LDA megatile_counter
   CMP #$10
   BNE not_end_of_row
@@ -234,6 +297,21 @@ process_loop:
   STA nametable_address_low
   LDX #$00
   STX megatile_counter
+  ; Increment nametable_address_high every 4 rows
+  LDA row_counter
+  CLC
+  ADC #$01
+  STA row_counter
+  LDA row_counter
+  CMP #$04
+  BNE not_end_of_four_rows
+  LDA nametable_address_high
+  CLC
+  ADC #$01
+  STA nametable_address_high
+  LDX #$00
+  STX row_counter
+not_end_of_four_rows:
 not_end_of_row:
   RTS
 .endproc
