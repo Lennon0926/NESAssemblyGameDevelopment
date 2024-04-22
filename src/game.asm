@@ -71,28 +71,28 @@ palettes:
 	JSR update_player
   JSR drawSprites
 
-;   LDA scroll
-;   CMP #$FF ; did we scroll to the end of a nametable?
-;   BNE set_scroll_positions
-;   ; if yes,
-;   ; Reset scroll to the beginning
-;   LDA #$00
-;   STA scroll
+  LDA scroll
+  CMP #$FF ; did we scroll to the end of a nametable?
+  BNE set_scroll_positions
+  ; if yes,
+  ; Reset scroll to the beginning
+  LDA #$00
+  STA scroll
 
-; set_scroll_positions:
-;   ; delay loop for slowing down the scroll
-;   LDX #$00
-; delay_loop:
-;   DEX
-;   BNE delay_loop
+set_scroll_positions:
+  ; delay loop for slowing down the scroll
+  LDX #$00
+delay_loop:
+  DEX
+  BNE delay_loop
 
-;   INC scroll
-;   LDA scroll ; X scroll first
-;   STA PPUSCROLL
+  INC scroll
+  LDA scroll ; X scroll first
+  STA PPUSCROLL
 
-;   ; Y scroll position remains constant
-;   LDA #$00
-;   STA PPUSCROLL
+  ; Y scroll position remains constant
+  LDA #$00
+  STA PPUSCROLL
   RTI
 .endproc
 
@@ -121,17 +121,13 @@ load_palettes:
   STA nametable_address_low
   LDA #$20
   STA nametable_address_high
-  LDA #$00
-  STA current_nametable
-  JSR draw_background
+  JSR draw_nametable_1
 
   LDA #$00
   STA nametable_address_low
   LDA #$24
   STA nametable_address_high
-  LDA #$01
-  STA current_nametable
-  JSR draw_background
+  JSR draw_nametable_2
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -148,23 +144,7 @@ forever:
 .endproc
 
 ; -------------------------Subroutines-------------------------
-.proc draw_background
-  PHP  ; Start by saving registers,
-  PHA  ; as usual.
-  TXA
-  PHA
-  TYA
-  PHA
-
-  LDA current_nametable
-  BEQ S1_nametable_1
-
-  LDA current_nametable
-  CMP #$00
-  BEQ jump_to_S1_nametable_2
-
-jump_to_S1_nametable_2:
-  JMP S1_nametable_2
+.proc draw_nametable_1
 
 S1_nametable_1:
     LDA #$00
@@ -347,7 +327,11 @@ S1_nametable_1:
     LDA #$aa
     STA tile_bit
     JSR process_tiles
-JMP done
+
+
+.endproc
+
+.proc draw_nametable_2
 
 S1_nametable_2:
     LDA #$00
@@ -530,16 +514,7 @@ S1_nametable_2:
     LDA #$aa
     STA tile_bit
     JSR process_tiles
-JMP done
 
-done:
-  PLA ; Done with updates, restore registers
-  TAY ; and return to where we called this
-  PLA
-  TAX
-  PLA
-  PLP
-  RTS
 .endproc
 
 .proc process_tiles
