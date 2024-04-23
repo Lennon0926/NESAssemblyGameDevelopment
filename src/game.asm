@@ -121,13 +121,7 @@ load_palettes:
   STA nametable_address_low
   LDA #$20
   STA nametable_address_high
-  JSR draw_nametable_1
-
-  LDA #$00
-  STA nametable_address_low
-  LDA #$24
-  STA nametable_address_high
-  JSR draw_nametable_2
+  JSR draw_background
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -144,9 +138,8 @@ forever:
 .endproc
 
 ; -------------------------Subroutines-------------------------
-.proc draw_nametable_1
+.proc draw_background
 
-S1_nametable_1:
     LDA #$00
     STA tile_bit
     JSR process_tiles
@@ -328,12 +321,6 @@ S1_nametable_1:
     STA tile_bit
     JSR process_tiles
 
-
-.endproc
-
-.proc draw_nametable_2
-
-S1_nametable_2:
     LDA #$00
     STA tile_bit
     JSR process_tiles
@@ -502,18 +489,7 @@ S1_nametable_2:
     LDA #$00
     STA tile_bit
     JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
+
 
 .endproc
 
