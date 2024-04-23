@@ -9,25 +9,23 @@ pad1: .res 1
 frame_counter: .res 1
 animation_counter: .res 1
 
-current_nametable: .res 1  ; Reserve 1 byte for the current nametable
-current_stage: .res 1
-
 scroll: .res 1
+scroll_flag: .res 1
 ppuctrl_settings: .res 1
 
-tile_index: .res 1
 tile_bit: .res 1
+tile_byte: .res 1
+
+low_byte_index: .res 1
 nametable_address_high: .res 1
 nametable_address_low: .res 1
+background_flag: .res 1
 
-tiles_processed: .res 1 ; Reserve 1 byte to count the number of tiles processed
-draw_counter: .res 1
-megatile_counter: .res 1
-row_counter: .res 1
-
+current_stage: .res 1
+current_nametable: .res 1
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
-.exportzp current_nametable, current_stage, scroll, ppuctrl_settings
+.exportzp scroll, scroll_flag
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -46,7 +44,8 @@ palettes:
 .byte $0F, $00, $00, $00
 .byte $0F, $00, $00, $00
 
-.include "background.asm"
+.include "backgrounds/stage_1.asm"
+.include "backgrounds/stage_2.asm"
 
 .segment "CHR"
 .incbin "sprites_and_background.chr"
@@ -66,44 +65,59 @@ palettes:
   LDA #$00
 
   JSR ReadController
-  ; update tiles *after* DMA transfer
-	; and after reading controller state
 	JSR update_player
   JSR drawSprites
 
-  LDA scroll
-  CMP #$FF ; did we scroll to the end of a nametable?
-  BNE set_scroll_positions
-  ; if yes,
-  ; Reset scroll to the beginning
-  LDA #$00
-  STA scroll
+  LDA background_flag
+  CMP #$01
+  BNE skip_background
 
-set_scroll_positions:
-  ; delay loop for slowing down the scroll
-  LDX #$00
-delay_loop:
-  DEX
-  BNE delay_loop
+init_stage_2_pos:
+  LDA #31
+  STA player_y 
+  LDA #$00
+  STA player_x
+
+  LDA current_stage 
+  EOR #%11
+  STA current_stage
+
+  jsr display_stage_background
+  lda #$00
+  sta background_flag
+
+reset_scroll:
+  STA scroll
+  STA scroll_flag
+  STA PPUSCROLL
+  STA PPUSCROLL 
+
+skip_background:
+  LDA scroll_flag
+  CMP #$00
+  BEQ skip_write
 
   INC scroll
-  LDA scroll ; X scroll first
-  STA PPUSCROLL
+  LDA scroll
+  BNE skip_reset
 
-  ; Y scroll position remains constant
+  LDA #255
+  STA scroll 
+  
+skip_reset:
+  STA PPUSCROLL
   LDA #$00
   STA PPUSCROLL
+
+skip_write:
+
   RTI
 .endproc
 
 .import reset_handler
 
 .export main
-.proc main
-  LDA #$00 ; X starts at 0!
-  STA scroll
-  
-  ; write a palette
+.proc main  
   LDX PPUSTATUS
   LDX #$3f
   STX PPUADDR
@@ -114,16 +128,14 @@ load_palettes:
   LDA palettes,X
   STA PPUDATA
   INX
-  CPX #$20       ; # Palettes x 4 bytes
+  CPX #$20
   BNE load_palettes
 
-  LDA #$00
-  STA nametable_address_low
-  LDA #$20
-  STA nametable_address_high
-  JSR draw_background
+  LDA #$01
+  STA current_stage
+  JSR display_stage_background
 
-vblankwait:       ; wait for another vblank before continuing
+vblankwait:
   BIT PPUSTATUS
   BPL vblankwait
 
@@ -133,454 +145,348 @@ vblankwait:       ; wait for another vblank before continuing
   LDA #%00011110  ; turn on screen
   STA PPUMASK
 
+init_ppuscroll:
+  LDA #$00
+  STA PPUSCROLL
+  STA PPUSCROLL
+
 forever:
   JMP forever
 .endproc
 
 ; -------------------------Subroutines-------------------------
-.proc draw_background
+.proc display_tile
+  LDA PPUSTATUS; 
+  LDA $02
+  STA PPUADDR
+  LDA $01
+  STA PPUADDR
+  LDA $00
+  STA PPUDATA
 
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00 
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$12
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$1e
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3E
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$55
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$56
-    STA tile_bit
-    JSR process_tiles
-    LDA #$11
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$02
-    STA tile_bit
-    JSR process_tiles
-    LDA #$51
-    STA tile_bit
-    JSR process_tiles
-    LDA #$57
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$16
-    STA tile_bit
-    JSR process_tiles
-    LDA #$41
-    STA tile_bit
-    JSR process_tiles
-    LDA #$4f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$3e
-    STA tile_bit
-    JSR process_tiles
-    LDA #$45
-    STA tile_bit
-    JSR process_tiles
-    LDA #$45
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$1e
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$40
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$12
-    STA tile_bit
-    JSR process_tiles
-    LDA #$55
-    STA tile_bit
-    JSR process_tiles
-    LDA #$44
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$12
-    STA tile_bit
-    JSR process_tiles
-    LDA #$fd
-    STA tile_bit
-    JSR process_tiles
-    LDA #$44
-    STA tile_bit
-    JSR process_tiles
-    LDA #$10
-    STA tile_bit
-    JSR process_tiles
-    LDA #$16
-    STA tile_bit
-    JSR process_tiles
-    LDA #$5d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$05
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$fd
-    STA tile_bit
-    JSR process_tiles
-    LDA #$4f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$ff
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00 
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$aa
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7c
-    STA tile_bit
-    JSR process_tiles
-    LDA #$fc
-    STA tile_bit
-    JSR process_tiles
-    LDA #$84
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7d
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$b4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$54
-    STA tile_bit
-    JSR process_tiles
-    LDA #$55
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$bc
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$44
-    STA tile_bit
-    JSR process_tiles
-    LDA #$95
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$d5
-    STA tile_bit
-    JSR process_tiles
-    LDA #$45
-    STA tile_bit
-    JSR process_tiles
-    LDA #$80
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$f1
-    STA tile_bit
-    JSR process_tiles
-    LDA #$41
-    STA tile_bit
-    JSR process_tiles
-    LDA #$94
-    STA tile_bit
-    JSR process_tiles
-    LDA #$04
-    STA tile_bit
-    JSR process_tiles
-    LDA #$51
-    STA tile_bit
-    JSR process_tiles
-    LDA #$51
-    STA tile_bit
-    JSR process_tiles
-    LDA #$bc
-    STA tile_bit
-    JSR process_tiles
-    LDA #$04
-    STA tile_bit
-    JSR process_tiles
-    LDA #$01
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-    LDA #$b4
-    STA tile_bit
-    JSR process_tiles
-    LDA #$04
-    STA tile_bit
-    JSR process_tiles
-    LDA #$11
-    STA tile_bit
-    JSR process_tiles
-    LDA #$55
-    STA tile_bit
-    JSR process_tiles
-    LDA #$84
-    STA tile_bit
-    JSR process_tiles
-    LDA #$04
-    STA tile_bit
-    JSR process_tiles
-    LDA #$11
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$84
-    STA tile_bit
-    JSR process_tiles
-    LDA #$15
-    STA tile_bit
-    JSR process_tiles
-    LDA #$50
-    STA tile_bit
-    JSR process_tiles
-    LDA #$75
-    STA tile_bit
-    JSR process_tiles
-    LDA #$94
-    STA tile_bit
-    JSR process_tiles
-    LDA #$ff
-    STA tile_bit
-    JSR process_tiles
-    LDA #$f1
-    STA tile_bit
-    JSR process_tiles
-    LDA #$7f
-    STA tile_bit
-    JSR process_tiles
-    LDA #$00
-    STA tile_bit
-    JSR process_tiles
-
-
+  RTS
 .endproc
 
-.proc process_tiles
-  LDA tile_bit
-  LDY #$04        ; Initialize a counter for 4 loops
-  STA draw_counter
-process_loop:
-  PHA             ; Push the accumulator onto the stack
-  AND #$03        ; Apply a mask to extract the two rightmost bits
-  STA tile_index  ; Store the result in tile_index
-  JSR draw_tiles  ; Call the draw_tiles subroutine
-  PLA             ; Pull the original value off the stack
-  LSR             ; Shift the accumulator right by one bit
-  LSR             ; Shift the accumulator right by one more bit
-  STA tile_bit    ; Store the shifted value in tile_bit
-  DEY             ; Decrement the loop counter
-  STA draw_counter
-  BNE process_loop; If counter is not zero, continue looping
+.proc display_stage_background
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
 
-  ; Increment the counter for tiles processed
-  INC tiles_processed
+disable:
+  LDA #%00000000
+  STA PPUMASK
+    
+  LDA ppuctrl_settings
+  AND #%01111000
+  STA PPUCTRL
+  STA ppuctrl_settings
 
-  RTS             ; Return from the subroutine
-.endproc
+  LDA current_stage
+  CMP #$02
+  BEQ stage_2
+
+stage_1:
+  LDA #$00
+  STA current_nametable
+
+  JMP finished
+
+stage_2:
+  LDA #$02
+  STA current_nametable
 
 
+finished:
+  LDY #$00
+  STY low_byte_index
+  STY nametable_address_low
 
-.proc draw_tiles
-  ; Load nametable address from parameter
-  LDA nametable_address_high
-  STA PPUADDR
-  LDA nametable_address_low
-  STA PPUADDR
+  LDA #$20
+  STA nametable_address_high
 
-  LDA tile_index
-  STA PPUDATA
-  STA PPUDATA
-  
-  ; Load nametable address from parameter
-  LDA nametable_address_high
-  STA PPUADDR
-; LOW BYTE FOR LEFT
-  LDA nametable_address_low
-  CLC 
-  ADC #$20
-  STA PPUADDR
+  JSR display_nametables
 
-  LDA tile_index
-  STA PPUDATA
-  STA PPUDATA
-
-  ; Add 2 to nametable_address_low
-  LDA nametable_address_low
-  CLC
-  ADC #$02
-  STA nametable_address_low
-
-  INC megatile_counter
-
-  ; Check if we've reached the end of the row
-  LDA megatile_counter
-  CMP #$10
-  BNE not_end_of_row
-  ; Move to the next row
-  LDA nametable_address_low
-  CLC
-  ADC #$20
-  STA nametable_address_low
-  LDX #$00
-  STX megatile_counter
-  ; Increment nametable_address_high every 4 rows
-  LDA row_counter
+  LDA current_nametable
   CLC
   ADC #$01
-  STA row_counter
-  LDA row_counter
+  STA current_nametable
+
+  LDY #$00
+  STY low_byte_index
+  STY nametable_address_low
+
+  LDA #$24
+  STA nametable_address_high
+
+  JSR display_nametables
+
+enable_rendering:
+  LDA #%10010000
+  STA PPUCTRL
+  STA ppuctrl_settings
+  LDA #%00011110
+  STA PPUMASK
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP 
+  RTS
+.endproc
+
+.proc display_nametables
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+
+load_background:
+  LDA current_nametable
+  CMP #$00
+  BNE nametable_2_stage_1
+
+  LDA S1_nametable_1, Y
+  JMP selected_nametable
+
+nametable_2_stage_1:
+  CMP #$01
+  BNE nametable_1_stage_2
+
+  LDA S1_nametable_2, Y
+  JMP selected_nametable
+
+nametable_1_stage_2:
+  CMP #$02
+  BNE nametable_2_stage_2
+
+  LDA S2_nametable_1, Y
+  JMP selected_nametable
+
+nametable_2_stage_2:
+  LDA S2_nametable_2, Y
+
+selected_nametable:
+  STA tile_byte
+  JSR process_bytes
+  INY
+
+add_low_byte_index:
+  LDA low_byte_index
+  CLC
+  ADC #$01
+  STA low_byte_index
+  LDA low_byte_index
   CMP #$04
-  BNE not_end_of_four_rows
+  BNE skip_low_byte_row_fix
+
+  LDA nametable_address_low
+  CLC
+  ADC #$20
+  STA nametable_address_low
+  BCC skip_overflow
+
   LDA nametable_address_high
   CLC
   ADC #$01
   STA nametable_address_high
-  LDX #$00
-  STX row_counter
-not_end_of_four_rows:
-not_end_of_row:
+
+skip_overflow:
+  LDA #$00
+  STA low_byte_index
+
+skip_low_byte_row_fix:
+  CPY #$3C
+  BNE load_background
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP 
   RTS
 .endproc
 
+.proc process_bytes
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
 
+  LDX #$00
+process_loop:
+  LDA #$00
+  STA tile_bit
+  ASL tile_byte
+  ROL tile_bit
+  ASL tile_byte
+  ROL tile_bit
+
+  LDA current_stage
+  CMP #$01
+  BEQ skip_add
+  
+  LDA tile_bit
+  CLC
+  ADC #$04
+  STA tile_bit
+
+skip_add:
+  JSR draw_megatiles
+
+  LDA nametable_address_low
+  CLC 
+  ADC #$02 
+  STA nametable_address_low
+
+  BCC skip_overflow
+  LDA nametable_address_high
+  CLC
+  ADC #$01
+  STA nametable_address_high
+
+skip_overflow:
+  INX
+  CPX #$04
+  BNE process_loop
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP   
+  RTS
+.endproc
+
+.proc draw_megatiles
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+
+  LDA PPUSTATUS
+  LDA nametable_address_high
+  STA PPUADDR
+  LDA nametable_address_low
+  STA PPUADDR
+  LDA tile_bit
+  STA PPUDATA
+
+  LDA nametable_address_high
+  STA PPUADDR
+  LDA nametable_address_low
+  CLC
+  ADC #$01
+  STA PPUADDR
+  LDA tile_bit
+  STA PPUDATA
+
+  ; bottom LEFT
+  LDX #$00
+  JSR helper_tiles
+
+  ; bottom RIGHT
+  LDX #$01
+  JSR helper_tiles
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
+.endproc
+
+.proc helper_tiles
+  PHP
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+
+  TXA
+  CMP #$01
+  BEQ right
+
+  LDA nametable_address_low
+  CLC
+  ADC #$20
+  jmp overflow
+
+right:
+  LDA nametable_address_low
+  CLC
+  ADC #$21
+
+overflow:
+  BCC no_overflow
+
+  LDA nametable_address_high
+  CLC 
+  ADC #$01
+  STA PPUADDR
+  TXA
+  CMP #$01 
+  BEQ low_byte_right
+
+  LDA nametable_address_low
+  CLC 
+  ADC #$20
+  STA PPUADDR 
+  JMP tile_ppu
+
+low_byte_right:
+  LDA nametable_address_low
+  CLC 
+  ADC #$21
+  STA PPUADDR
+  JMP tile_ppu
+  
+no_overflow: 
+  LDA nametable_address_high
+  sta PPUADDR
+  TXA
+  CMP #$01
+  BEQ low_byte_no_overflow
+
+  LDA nametable_address_low
+  CLC
+  ADC #$20 
+  STA PPUADDR
+  JMP tile_ppu
+
+low_byte_no_overflow:
+  LDA nametable_address_low
+  CLC
+  ADC #$21
+  STA PPUADDR
+
+tile_ppu:
+  LDA tile_bit
+  STA PPUDATA
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
+.endproc
 
 .proc update_player
   PHP  ; Start by saving registers,
