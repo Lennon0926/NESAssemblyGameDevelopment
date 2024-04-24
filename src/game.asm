@@ -591,7 +591,7 @@ check_right:
   CMP #255  ; Compare scroll with maximum scroll value
   BNE increment_scroll  ; If scroll is not at max, increment scroll
   LDA player_x
-  CMP #245  ; Compare player_x with 245
+  CMP #240  ; Compare player_x with 245
   BEQ check_up  ; If player_x is equal to f8, skip incrementing player_x
   INC player_x  ; If scroll is at max, increment player x
   JMP check_up  ; Skip to next check
