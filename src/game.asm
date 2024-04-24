@@ -68,6 +68,7 @@ palettes:
 	JSR update_player
   JSR drawSprites
   JSR change_stage
+  JSR scroll_activation
 
   LDA background_flag
   CMP #$01
@@ -164,6 +165,17 @@ forever:
   LDA #$01
   STA background_flag
 
+skip_change:
+  RTS
+.endproc
+
+.proc scroll_activation
+  LDA pad1
+  CMP #%0100000
+  BNE skip_change
+
+  LDA #$01
+  STA scroll_flag
 
 skip_change:
   RTS
