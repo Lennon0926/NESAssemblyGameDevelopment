@@ -28,11 +28,13 @@ time_frame_counter: .res 1
 time_counter: .res 1
 
 players_lives: .res 1
+player_win: .res 1
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
 .exportzp scroll, scroll_flag
 .exportzp time_counter, time_frame_counter
-.exportzp players_lives
+.exportzp players_lives, player_win
+.exportzp current_stage, current_nametable
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -67,6 +69,7 @@ palettes:
 .import draw_timer
 .import reset_game
 .import lose_screen
+.import win_screen
 
 .proc nmi_handler
   LDA #$00
@@ -79,6 +82,15 @@ palettes:
 
   ; read controller inputs
   JSR ReadController
+  JSR win_screen
+
+  LDA player_win
+  CMP #$01
+  BNE continue_game
+
+  JMP done
+
+continue_game:
   JSR lose_screen
   ; Updateb player position
 	JSR update_player
@@ -571,6 +583,22 @@ tile_ppu:
   PHA
 
   LDA pad1        ; Load button presses
+  AND #BTN_UP     ; Filter out all but Up
+  BEQ check_down  ; If result is zero, up not pressed
+  DEC player_y
+  LDA #DIR_UP  ; Update player direction to up
+  STA player_dir
+  JMP check_left  ; Skip to next check
+check_down:
+  LDA pad1
+  AND #BTN_DOWN
+  BEQ check_left
+  INC player_y
+  LDA #DIR_DOWN  ; Update player direction to down
+  STA player_dir
+  JMP check_left  ; Skip to next check
+check_left:
+  LDA pad1
   AND #BTN_LEFT   ; Filter out all but Left
   BEQ check_right ; If result is zero, left not pressed
   LDA scroll
@@ -588,32 +616,21 @@ decrement_scroll:
 check_right:
   LDA pad1
   AND #BTN_RIGHT
-  BEQ check_up
+  BEQ done_checking
   LDA scroll
   CMP #255  ; Compare scroll with maximum scroll value
   BNE increment_scroll  ; If scroll is not at max, increment scroll
   LDA player_x
   CMP #240  ; Compare player_x with 245
-  BEQ check_up  ; If player_x is equal to f8, skip incrementing player_x
+  BEQ done_checking  ; If player_x is equal to f8, skip incrementing player_x
   INC player_x  ; If scroll is at max, increment player x
-  JMP check_up  ; Skip to next check
 increment_scroll:
+  LDA scroll
+  CMP #255  ; Compare scroll with maximum scroll value
+  BEQ done_incrementing  ; If scroll is already at max, skip incrementing
   INC scroll
+done_incrementing:
   LDA #DIR_RIGHT  ; Update player direction to right
-  STA player_dir
-check_up:
-  LDA pad1
-  AND #BTN_UP
-  BEQ check_down
-  DEC player_y
-  LDA #DIR_UP  ; Update player direction to up
-  STA player_dir
-check_down:
-  LDA pad1
-  AND #BTN_DOWN
-  BEQ done_checking
-  INC player_y
-  LDA #DIR_DOWN  ; Update player direction to down
   STA player_dir
 done_checking:
   PLA ; Done with updates, restore registers

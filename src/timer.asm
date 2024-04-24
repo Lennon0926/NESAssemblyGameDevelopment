@@ -11,6 +11,7 @@
 .importzp time_counter
 .importzp pad1
 .importzp players_lives
+.importzp player_win
 
 .proc draw_lose
   PHP  ; Save registers
@@ -226,30 +227,11 @@ show_lose_screen:
 
 restar_game:
   JSR reset_handler
-  ; JSR reset_game
 
 Done:
   RTS
 .endproc
 
-; .proc reset_game
-;   PHP  ; Save registers
-;   PHA
-;   TXA
-;   PHA
-;   TYA
-;   PHA
-
-
-  
-;   PLA
-;   TAY
-;   PLA
-;   TAX
-;   PLA
-;   PLP
-;   RTS
-; .endproc
 .proc draw_timer
   PHP  ; Save registers
   PHA
