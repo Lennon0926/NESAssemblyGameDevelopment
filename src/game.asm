@@ -62,32 +62,44 @@ palettes:
   STA OAMADDR
   LDA #$02
   STA OAMDMA
+
+  ; reset accumulator
   LDA #$00
 
+  ; read controller inputs
   JSR ReadController
+  ; Updateb player position
 	JSR update_player
+  ; Draw player sprite
   JSR drawSprites
+  ; Change stage if necessary
   JSR change_stage
+  ; Activate scrolling if necessary
   JSR scroll_activation
 
+  ; check if background needs to be drawn
   LDA background_flag
   CMP #$01
   BNE skip_background
 
+  ; Initialize player position in stage 2
 init_stage_2_pos:
 	LDA #$00
 	STA player_x
 	LDA #$D0
 	STA player_y
 
+  ; Toggle current stage between 1, 2, 0
   LDA current_stage 
   EOR #%11
   STA current_stage
 
-  jsr draw_background
-  lda #$00
-  sta background_flag
+  ; Draw background
+  JSR draw_background
+  LDA #$00
+  STA background_flag
 
+  ; Reset scroll variables
 reset_scroll:
   STA scroll
   STA scroll_flag
@@ -95,14 +107,16 @@ reset_scroll:
   STA PPUSCROLL 
 
 skip_background:
+  ; check if scrolling is activated
   LDA scroll_flag
   CMP #$00
-  BEQ skip_write
-
+  BEQ done
+  ; Increment scroll position
   INC scroll
   LDA scroll
   BNE skip_reset
 
+  ; Reset scroll position to 255
   LDA #255
   STA scroll 
   
@@ -111,7 +125,7 @@ skip_reset:
   LDA #$00
   STA PPUSCROLL
 
-skip_write:
+done:
 
   RTI
 .endproc
@@ -158,38 +172,26 @@ forever:
 
 ; -------------------------Subroutines-------------------------
 .proc change_stage
-  LDA pad1
-  CMP #%1000000
-  BNE skip_change
+  LDA pad1          ; Load the value of the controller input
+  CMP #%1000000     ; Compare it with the mask for the A button
+  BNE skip_change   ; If not equal, skip the stage change
 
-  LDA #$01
+  LDA #$01          ; Set the background flag to switch the background
   STA background_flag
 
 skip_change:
-  RTS
+  RTS               ; Return from subroutine
 .endproc
 
 .proc scroll_activation
-  LDA pad1
-  CMP #%0100000
-  BNE skip_change
+  LDA pad1  ; Load the value of the first controller (pad1) into the accumulator
+  CMP #%0100000   ; Compare the loaded value with #%0100000 (corresponding to the select button)
+  BNE skip_change   ; If the comparison result is not equal, branch to skip_change
 
-  LDA #$01
+  LDA #$01    ; Set scroll_flag to #$01 to activate scrolling
   STA scroll_flag
 
 skip_change:
-  RTS
-.endproc
-
-.proc display_tile
-  LDA PPUSTATUS; 
-  LDA $02
-  STA PPUADDR
-  LDA $01
-  STA PPUADDR
-  LDA $00
-  STA PPUDATA
-
   RTS
 .endproc
 
@@ -201,58 +203,73 @@ skip_change:
   TYA
   PHA
 
+  ; Disable rendering
 disable:
+  ; Disable rendering by setting PPUMASK to #%00000000
   LDA #%00000000
   STA PPUMASK
     
+  ; Clear the sprite pattern table address in PPUCTRL
   LDA ppuctrl_settings
   AND #%01111000
   STA PPUCTRL
   STA ppuctrl_settings
 
+  ; Check the current stage
   LDA current_stage
   CMP #$02
   BEQ stage_2
 
 stage_1:
+  ; Set current_nametable to #$00 for stage 1
   LDA #$00
   STA current_nametable
-
+  ; Jump to the finished label
   JMP finished
 
 stage_2:
+  ; Set current_nametable to #$02 for stage 2
   LDA #$02
   STA current_nametable
 
 
 finished:
+  ; Initialize variables for rendering
   LDY #$00
   STY low_byte_index
   STY nametable_address_low
 
+  ; Set nametable_address_high to #$20 for rendering
   LDA #$20
   STA nametable_address_high
 
+  ; Call the display_nametables subroutine
   JSR display_nametables
 
+  ; Increment current_nametable for the next iteration
   LDA current_nametable
   CLC
   ADC #$01
   STA current_nametable
 
+  ; Reset variables for the next nametable
   LDY #$00
   STY low_byte_index
   STY nametable_address_low
 
+  ; Set nametable_address_high to #$24 for rendering the second nametable
   LDA #$24
   STA nametable_address_high
 
+ ; Call the display_nametables subroutine again for the second nametable
   JSR display_nametables
 
 enable_rendering:
+  ; Enable rendering by setting PPUCTRL to #%10010000
   LDA #%10010000
   STA PPUCTRL
   STA ppuctrl_settings
+  ; Set PPUMASK to #%00011110 for showing background and sprites
   LDA #%00011110
   STA PPUMASK
 
@@ -274,10 +291,12 @@ enable_rendering:
   PHA
 
 load_background:
+  ; Load current nametable based on the current stage
   LDA current_nametable
   CMP #$00
   BNE nametable_2_stage_1
 
+  ; Load tile data from stage 1, nametable 1
   LDA S1_nametable_1, Y
   JMP selected_nametable
 
@@ -285,6 +304,7 @@ nametable_2_stage_1:
   CMP #$01
   BNE nametable_1_stage_2
 
+  ; Load tile data from stage 1, nametable 2
   LDA S1_nametable_2, Y
   JMP selected_nametable
 
@@ -292,26 +312,34 @@ nametable_1_stage_2:
   CMP #$02
   BNE nametable_2_stage_2
 
+  ; Load tile data from stage 2, nametable 1
   LDA S2_nametable_1, Y
   JMP selected_nametable
 
 nametable_2_stage_2:
+  ; Load tile data from stage 2, nametable 2
   LDA S2_nametable_2, Y
 
 selected_nametable:
+  ; Store loaded tile byte in tile_byte
   STA tile_byte
-  JSR process_bytes
+  ; Process the loaded byte
+  JSR process_tiles
+  ; Increment Y to move to the next tile byte
   INY
 
 add_low_byte_index:
+  ; Increment low_byte_index
   LDA low_byte_index
   CLC
   ADC #$01
   STA low_byte_index
+  ; Check if low_byte_index has reached 4 (end of a row)
   LDA low_byte_index
   CMP #$04
   BNE skip_low_byte_row_fix
 
+  ; If end of row, adjust nametable address
   LDA nametable_address_low
   CLC
   ADC #$20
@@ -324,10 +352,12 @@ add_low_byte_index:
   STA nametable_address_high
 
 skip_overflow:
+  ; Reset low_byte_index to start a new row
   LDA #$00
   STA low_byte_index
 
 skip_low_byte_row_fix:
+  ; Check if all rows have been processed
   CPY #$3C
   BNE load_background
 
@@ -340,7 +370,7 @@ skip_low_byte_row_fix:
   RTS
 .endproc
 
-.proc process_bytes
+.proc process_tiles
   PHP
   PHA
   TXA
@@ -348,32 +378,40 @@ skip_low_byte_row_fix:
   TYA
   PHA
 
+  ; Initialize X register to 0 for loop counter
   LDX #$00
 process_loop:
+  ; Reset tile_bit to 0
   LDA #$00
   STA tile_bit
+  ; Shift left and rotate tile_byte into tile_bit
   ASL tile_byte
   ROL tile_bit
   ASL tile_byte
   ROL tile_bit
 
+  ; Check if current stage is 1 to skip adding 4 to tile_bit
   LDA current_stage
   CMP #$01
   BEQ skip_add
-  
+
+  ; Add 4 to tile_bit
   LDA tile_bit
   CLC
   ADC #$04
   STA tile_bit
 
 skip_add:
+  ; Call draw_megatiles subroutine
   JSR draw_megatiles
 
+  ; Increment nametable address low by 2
   LDA nametable_address_low
   CLC 
   ADC #$02 
   STA nametable_address_low
 
+  ; Check for overflow in nametable address low, adjust high if needed
   BCC skip_overflow
   LDA nametable_address_high
   CLC
@@ -381,7 +419,9 @@ skip_add:
   STA nametable_address_high
 
 skip_overflow:
+  ; Increment X (loop counter)
   INX
+  ; Check if X is less than 4 to continue loop
   CPX #$04
   BNE process_loop
 
@@ -402,28 +442,34 @@ skip_overflow:
   TYA
   PHA
 
+  ; Set PPU address to nametable_address_high
   LDA PPUSTATUS
   LDA nametable_address_high
   STA PPUADDR
+  ; Set PPU address to nametable_address_low
   LDA nametable_address_low
   STA PPUADDR
+  ; Store tile_bit into PPUDATA (pattern table)
   LDA tile_bit
   STA PPUDATA
 
+ ; Set PPU address to nametable_address_high
   LDA nametable_address_high
   STA PPUADDR
+  ; Increment PPU address by 1 (low byte)
   LDA nametable_address_low
   CLC
   ADC #$01
   STA PPUADDR
+  ; Store tile_bit into PPUDATA (attribute table)
   LDA tile_bit
   STA PPUDATA
 
-  ; bottom LEFT
+  ; Draw bottom LEFT tile
   LDX #$00
   JSR helper_tiles
 
-  ; bottom RIGHT
+  ; Draw bottom RIGHT tile
   LDX #$01
   JSR helper_tiles
 
@@ -444,23 +490,28 @@ skip_overflow:
   TYA
   PHA
 
+ ; Check if X register is equal to 1 (right tile)
   TXA
   CMP #$01
   BEQ right
 
+  ; Add 32 to nametable_address_low for left tile
   LDA nametable_address_low
   CLC
   ADC #$20
-  jmp overflow
+  JMP overflow
 
 right:
+  ; Add 33 to nametable_address_low for right tile
   LDA nametable_address_low
   CLC
   ADC #$21
 
 overflow:
+  ; Check for overflow
   BCC no_overflow
 
+  ; If overflow, increment nametable_address_high
   LDA nametable_address_high
   CLC 
   ADC #$01
@@ -469,6 +520,7 @@ overflow:
   CMP #$01 
   BEQ low_byte_right
 
+  ; Add 32 to nametable_address_low for left tile after overflow
   LDA nametable_address_low
   CLC 
   ADC #$20
@@ -476,6 +528,7 @@ overflow:
   JMP tile_ppu
 
 low_byte_right:
+  ; Add 33 to nametable_address_low for right tile after overflow
   LDA nametable_address_low
   CLC 
   ADC #$21
@@ -483,12 +536,14 @@ low_byte_right:
   JMP tile_ppu
   
 no_overflow: 
+  ; If no overflow, set nametable_address_high
   LDA nametable_address_high
-  sta PPUADDR
+  STA PPUADDR
   TXA
   CMP #$01
   BEQ low_byte_no_overflow
 
+  ; Add 32 to nametable_address_low for left tile without overflow
   LDA nametable_address_low
   CLC
   ADC #$20 
@@ -496,12 +551,14 @@ no_overflow:
   JMP tile_ppu
 
 low_byte_no_overflow:
+  ; Add 33 to nametable_address_low for right tile without overflow
   LDA nametable_address_low
   CLC
   ADC #$21
   STA PPUADDR
 
 tile_ppu:
+  ; Store tile_bit into PPUDATA
   LDA tile_bit
   STA PPUDATA
 
