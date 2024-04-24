@@ -38,6 +38,18 @@ clear_oam:
 	STA player_x
 	LDA #$D0
 	STA player_y
+
+  LDA #$3F
+  STA time_frame_counter
+
+  LDA #$00
+  STA time_counter
+
+  LDA #%00011110  ; turn on screen
+  STA PPUMASK
+
+  LDA #$01
+  STA players_lives
   
 vblankwait2:
   BIT PPUSTATUS

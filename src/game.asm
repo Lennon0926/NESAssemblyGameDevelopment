@@ -27,9 +27,12 @@ current_nametable: .res 1
 time_frame_counter: .res 1
 time_counter: .res 1
 
+players_lives: .res 1
+
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
 .exportzp scroll, scroll_flag
 .exportzp time_counter, time_frame_counter
+.exportzp players_lives
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -63,6 +66,7 @@ palettes:
 .import ReadController
 .import draw_timer
 .import reset_game
+.import lose_screen
 
 .proc nmi_handler
   LDA #$00
@@ -75,6 +79,7 @@ palettes:
 
   ; read controller inputs
   JSR ReadController
+  JSR lose_screen
   ; Updateb player position
 	JSR update_player
   ; Draw player sprite
@@ -148,6 +153,9 @@ done:
   STX PPUADDR
   LDX #$00
   STX PPUADDR
+
+  LDA #$01
+  STA players_lives
 
 load_palettes:
   LDA palettes,X

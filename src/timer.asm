@@ -1,12 +1,18 @@
-.export reset_game
 .export draw_timer
+.export lose_screen
+
+.include "constants.inc"
+
+.import reset_handler
 
 .importzp player_x
 .importzp player_y
 .importzp time_frame_counter
 .importzp time_counter
+.importzp pad1
+.importzp players_lives
 
-.proc reset_game
+.proc draw_lose
   PHP  ; Save registers
   PHA
   TXA
@@ -14,13 +20,182 @@
   TYA
   PHA
 
+  ; L
+  LDA #$08
+  STA $0231
+  LDA #$09
+  STA $0235
+  LDA #$18
+  STA $0239
+  LDA #$19
+  STA $023D
+
+  LDA #$00
+  STA $0232
+  STA $0236
+  STA $023A
+  STA $023E
+
+  LDA #$70
+  STA $0230
   LDA #$60
-  STA player_x
-  LDA #$D0
-  STA player_y
-  LDA #$3F
-  STA time_frame_counter
-  
+  STA $0233
+
+  LDA #$70
+  STA $0234
+  LDA #$60
+  CLC
+  ADC #$08
+  STA $0237
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $0238
+  LDA #$60
+  STA $023B
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $023C
+  LDA #$60
+  CLC
+  ADC #$08
+  STA $023F
+
+  ; O
+  LDA #$28
+  STA $0241
+  LDA #$29
+  STA $0245
+  LDA #$38
+  STA $0249
+  LDA #$39
+  STA $024D
+
+  LDA #$00
+  STA $0242
+  STA $0246
+  STA $024A
+  STA $024E
+
+  LDA #$70
+  STA $0240
+  LDA #$6F
+  STA $0243
+
+  LDA #$70
+  STA $0244
+  LDA #$6F
+  CLC
+  ADC #$08
+  STA $0247
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $0248
+  LDA #$6F
+  STA $024B
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $024C
+  LDA #$6F
+  CLC
+  ADC #$08
+  STA $024F
+
+  ; S
+  LDA #$48
+  STA $0251
+  LDA #$49
+  STA $0255
+  LDA #$58
+  STA $0259
+  LDA #$59
+  STA $025D
+
+  LDA #$00
+  STA $0252
+  STA $0256
+  STA $025A
+  STA $025E
+
+  LDA #$70
+  STA $0250
+  LDA #$7F
+  STA $0253
+
+  LDA #$70
+  STA $0254
+  LDA #$7F
+  CLC
+  ADC #$08
+  STA $0257
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $0258
+  LDA #$7F
+  STA $025B
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $025C
+  LDA #$7F
+  CLC
+  ADC #$08
+  STA $025F
+
+  ; E
+  LDA #$68
+  STA $0261
+  LDA #$69
+  STA $0265
+  LDA #$78
+  STA $0269
+  LDA #$79
+  STA $026D
+
+  LDA #$00
+  STA $0262
+  STA $0266
+  STA $026A
+  STA $026E
+
+  LDA #$70
+  STA $0260
+  LDA #$8D
+  STA $0263
+
+  LDA #$70
+  STA $0264
+  LDA #$8D
+  CLC
+  ADC #$08
+  STA $0267
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $0268
+  LDA #$8D
+  STA $026B
+
+  LDA #$70
+  CLC
+  ADC #$08
+  STA $026C
+  LDA #$8D
+  CLC
+  ADC #$08
+  STA $026F
+
   PLA
   TAY
   PLA
@@ -29,6 +204,52 @@
   PLP
   RTS
 .endproc
+
+.proc lose_screen
+  LDA players_lives
+  CMP #$00
+  BEQ show_lose_screen
+
+  JMP Done
+
+show_lose_screen:
+  LDA pad1
+  CMP #%00010000 
+  BEQ restar_game
+
+  LDA #%00010110 ; turn on screen
+  STA PPUMASK
+
+  JSR draw_lose
+
+  JMP Done
+
+restar_game:
+  JSR reset_handler
+  ; JSR reset_game
+
+Done:
+  RTS
+.endproc
+
+; .proc reset_game
+;   PHP  ; Save registers
+;   PHA
+;   TXA
+;   PHA
+;   TYA
+;   PHA
+
+
+  
+;   PLA
+;   TAY
+;   PLA
+;   TAX
+;   PLA
+;   PLP
+;   RTS
+; .endproc
 .proc draw_timer
   PHP  ; Save registers
   PHA
@@ -37,6 +258,13 @@
   TYA
   PHA
 
+  LDA players_lives
+  CMP #$00
+  BNE draw
+
+  JMP Done
+
+draw:
   LDA time_counter
   CMP #$0A
   BEQ tram_30
@@ -167,7 +395,8 @@ tram_0:
 Number_30:
   JSR draw_3_left
   JSR draw_0_right
-  JSR reset_game
+  LDA #$3F
+  STA time_frame_counter
   JMP Done
 
 Number_29:
@@ -318,6 +547,9 @@ Number_1:
 Number_0:
   JSR draw_0_left
   JSR draw_0_right
+  LDA #$00
+  STA players_lives
+  JSR lose_screen
   JMP Done
 
 
