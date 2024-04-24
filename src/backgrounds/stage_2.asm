@@ -1,32 +1,32 @@
 S2_nametable_1:
     .byte $00,$00,$00,$00
     .byte $aa,$aa,$aa,$aa
-    .byte $b4,$17,$51,$54
-    .byte $b4,$17,$53,$f4
-    .byte $bc,$00,$01,$54
-    .byte $95,$44,$00,$00
-    .byte $80,$45,$d5,$15
-    .byte $94,$7d,$fd,$3c
-    .byte $80,$5d,$5d,$34
-    .byte $b4,$3f,$01,$04
-    .byte $b4,$55,$11,$04
-    .byte $b4,$7f,$11,$04
-    .byte $94,$75,$5f,$d5
-    .byte $00,$40,$0d,$ff
+    .byte $87,$40,$00,$00
+    .byte $83,$05,$41,$55
+    .byte $85,$57,$55,$00
+    .byte $85,$57,$00,$00
+    .byte $8f,$c5,$15,$55
+    .byte $9d,$c0,$00,$01
+    .byte $bd,$f1,$51,$7d
+    .byte $b5,$71,$51,$5d
+    .byte $b1,$35,$d5,$1d
+    .byte $b0,$37,$fd,$0c
+    .byte $94,$57,$dd,$55
+    .byte $00,$03,$cc,$05
     .byte $aa,$aa,$aa,$aa
 S2_nametable_2:
     .byte $00,$00,$00,$00
     .byte $aa,$aa,$aa,$aa
-    .byte $15,$11,$04,$fe
-    .byte $3f,$10,$04,$56
-    .byte $15,$14,$54,$42
-    .byte $00,$3f,$f0,$76
-    .byte $54,$15,$50,$76
-    .byte $30,$0d,$00,$02
-    .byte $10,$4d,$50,$56
-    .byte $14,$05,$f0,$fe
-    .byte $10,$7d,$f0,$5e
-    .byte $00,$7d,$50,$1e
-    .byte $75,$40,$14,$1e
-    .byte $00,$05,$3c,$00
+    .byte $0c,$1f,$c0,$0e
+    .byte $5d,$5d,$c5,$5e
+    .byte $0c,$1d,$c1,$3e
+    .byte $1d,$5d,$c1,$16
+    .byte $5f,$7c,$fd,$02
+    .byte $57,$5d,$5c,$12
+    .byte $4f,$ff,$0c,$52
+    .byte $7d,$f7,$00,$42
+    .byte $75,$f7,$55,$52
+    .byte $30,$d7,$c7,$d2
+    .byte $50,$53,$45,$d2
+    .byte $00,$4f,$40,$c0
     .byte $aa,$aa,$aa,$aa

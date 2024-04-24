@@ -131,7 +131,7 @@ load_palettes:
   CPX #$20
   BNE load_palettes
 
-  LDA #$01
+  LDA #$02
   STA current_stage
   JSR display_stage_background
 
