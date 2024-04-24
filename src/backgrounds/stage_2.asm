@@ -1,0 +1,32 @@
+S2_nametable_1:
+    .byte $00,$00,$00,$00
+    .byte $aa,$aa,$aa,$aa
+    .byte $87,$40,$00,$00
+    .byte $83,$05,$41,$55
+    .byte $85,$57,$55,$00
+    .byte $85,$57,$00,$00
+    .byte $8f,$c5,$15,$55
+    .byte $9d,$c0,$00,$01
+    .byte $bd,$f1,$51,$7d
+    .byte $b5,$71,$51,$5d
+    .byte $b1,$35,$d5,$1d
+    .byte $b0,$37,$fd,$0c
+    .byte $94,$57,$dd,$55
+    .byte $00,$03,$cc,$05
+    .byte $aa,$aa,$aa,$aa
+S2_nametable_2:
+    .byte $00,$00,$00,$00
+    .byte $aa,$aa,$aa,$aa
+    .byte $0c,$1f,$c0,$0e
+    .byte $5d,$5d,$c5,$5e
+    .byte $0c,$1d,$c1,$3e
+    .byte $1d,$5d,$c1,$16
+    .byte $5f,$7c,$fd,$02
+    .byte $57,$5d,$5c,$12
+    .byte $4f,$ff,$0c,$52
+    .byte $7d,$f7,$00,$42
+    .byte $75,$f7,$55,$52
+    .byte $30,$d7,$c7,$d2
+    .byte $50,$53,$45,$d2
+    .byte $00,$4f,$40,$c0
+    .byte $aa,$aa,$aa,$aa
