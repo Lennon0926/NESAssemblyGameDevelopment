@@ -75,7 +75,6 @@ palettes:
   ; Change stage if necessary
   JSR change_stage
   ; Activate scrolling if necessary
-  JSR scroll_activation
 
   ; check if background needs to be drawn
   LDA background_flag
@@ -181,18 +180,6 @@ forever:
 
 skip_change:
   RTS               ; Return from subroutine
-.endproc
-
-.proc scroll_activation
-  LDA pad1  ; Load the value of the first controller (pad1) into the accumulator
-  CMP #%0100000   ; Compare the loaded value with #%0100000 (corresponding to the select button)
-  BNE skip_change   ; If the comparison result is not equal, branch to skip_change
-
-  LDA #$01    ; Set scroll_flag to #$01 to activate scrolling
-  STA scroll_flag
-
-skip_change:
-  RTS
 .endproc
 
 .proc draw_background
