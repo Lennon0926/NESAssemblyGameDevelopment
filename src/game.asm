@@ -74,7 +74,6 @@ palettes:
   JSR drawSprites
   ; Change stage if necessary
   JSR change_stage
-  ; Activate scrolling if necessary
 
   ; check if background needs to be drawn
   LDA background_flag
