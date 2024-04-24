@@ -67,6 +67,7 @@ palettes:
   JSR ReadController
 	JSR update_player
   JSR drawSprites
+  JSR change_stage
 
   LDA background_flag
   CMP #$01
@@ -155,6 +156,19 @@ forever:
 .endproc
 
 ; -------------------------Subroutines-------------------------
+.proc change_stage
+  LDA pad1
+  CMP #%1000000
+  BNE skip_change
+
+  LDA #$01
+  STA background_flag
+
+
+skip_change:
+  RTS
+.endproc
+
 .proc display_tile
   LDA PPUSTATUS; 
   LDA $02
