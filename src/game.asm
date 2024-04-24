@@ -16,7 +16,7 @@ ppuctrl_settings: .res 1
 tile_bit: .res 1
 tile_byte: .res 1
 
-low_byte_index: .res 1
+process_counter: .res 1
 nametable_address_high: .res 1
 nametable_address_low: .res 1
 background_flag: .res 1
@@ -75,7 +75,7 @@ palettes:
   ; Change stage if necessary
   JSR change_stage
   ; Activate scrolling if necessary
-  JSR scroll_activation
+  ; JSR scroll_activation
 
   ; check if background needs to be drawn
   LDA background_flag
@@ -109,15 +109,15 @@ reset_scroll:
 skip_background:
   ; check if scrolling is activated
   LDA scroll_flag
-  CMP #$00
+  CMP #$01
   BEQ done
   ; Increment scroll position
   INC scroll
   LDA scroll
   BNE skip_reset
 
-  ; Reset scroll position to 255
-  LDA #255
+  ; Reset scroll position to 0 after reaching 255 to create a loop
+  LDA #00
   STA scroll 
   
 skip_reset:
@@ -183,17 +183,17 @@ skip_change:
   RTS               ; Return from subroutine
 .endproc
 
-.proc scroll_activation
-  LDA pad1  ; Load the value of the first controller (pad1) into the accumulator
-  CMP #%0100000   ; Compare the loaded value with #%0100000 (corresponding to the select button)
-  BNE skip_change   ; If the comparison result is not equal, branch to skip_change
+; .proc scroll_activation
+;   LDA pad1  ; Load the value of the first controller (pad1) into the accumulator
+;   CMP #%0100000   ; Compare the loaded value with #%0100000 (corresponding to the select button)
+;   BNE skip_change   ; If the comparison result is not equal, branch to skip_change
 
-  LDA #$01    ; Set scroll_flag to #$01 to activate scrolling
-  STA scroll_flag
+;   LDA #$01    ; Set scroll_flag to #$01 to activate scrolling
+;   STA scroll_flag
 
-skip_change:
-  RTS
-.endproc
+; skip_change:
+;   RTS
+; .endproc
 
 .proc draw_background
   PHP
@@ -236,7 +236,7 @@ stage_2:
 finished:
   ; Initialize variables for rendering
   LDY #$00
-  STY low_byte_index
+  STY process_counter
   STY nametable_address_low
 
   ; Set nametable_address_high to #$20 for rendering
@@ -254,7 +254,7 @@ finished:
 
   ; Reset variables for the next nametable
   LDY #$00
-  STY low_byte_index
+  STY process_counter
   STY nametable_address_low
 
   ; Set nametable_address_high to #$24 for rendering the second nametable
@@ -328,14 +328,14 @@ selected_nametable:
   ; Increment Y to move to the next tile byte
   INY
 
-add_low_byte_index:
-  ; Increment low_byte_index
-  LDA low_byte_index
+add_process_counter:
+  ; Increment process_counter
+  LDA process_counter
   CLC
   ADC #$01
-  STA low_byte_index
-  ; Check if low_byte_index has reached 4 (end of a row)
-  LDA low_byte_index
+  STA process_counter
+  ; Check if process_counter has reached 4 (end of a row)
+  LDA process_counter
   CMP #$04
   BNE skip_low_byte_row_fix
 
@@ -352,9 +352,9 @@ add_low_byte_index:
   STA nametable_address_high
 
 skip_overflow:
-  ; Reset low_byte_index to start a new row
+  ; Reset process_counter to start a new row
   LDA #$00
-  STA low_byte_index
+  STA process_counter
 
 skip_low_byte_row_fix:
   ; Check if all rows have been processed
@@ -452,17 +452,6 @@ skip_overflow:
   ; Store tile_bit into PPUDATA (pattern table)
   LDA tile_bit
   STA PPUDATA
-
- ; Set PPU address to nametable_address_high
-  LDA nametable_address_high
-  STA PPUADDR
-  ; Increment PPU address by 1 (low byte)
-  LDA nametable_address_low
-  CLC
-  ADC #$01
-  STA PPUADDR
-  ; Store tile_bit into PPUDATA (attribute table)
-  LDA tile_bit
   STA PPUDATA
 
   ; Draw bottom LEFT tile
