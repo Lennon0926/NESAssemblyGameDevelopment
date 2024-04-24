@@ -86,11 +86,8 @@ palettes:
   JSR drawSprites
   ; Change stage if necessary
   JSR change_stage
-  ; Activate scrolling if necessary
-  ; JSR scroll_activation
   ; Draw timer
   JSR draw_timer
-
   ; check if background needs to be drawn
   LDA background_flag
   CMP #$01
@@ -126,7 +123,7 @@ skip_background:
   CMP #$01
   BEQ done
   ; Increment scroll position
-  INC scroll
+  ; INC scroll
   LDA scroll
   BNE skip_reset
 
@@ -199,18 +196,6 @@ forever:
 skip_change:
   RTS               ; Return from subroutine
 .endproc
-
-; .proc scroll_activation
-;   LDA pad1  ; Load the value of the first controller (pad1) into the accumulator
-;   CMP #%0100000   ; Compare the loaded value with #%0100000 (corresponding to the select button)
-;   BNE skip_change   ; If the comparison result is not equal, branch to skip_change
-
-;   LDA #$01    ; Set scroll_flag to #$01 to activate scrolling
-;   STA scroll_flag
-
-; skip_change:
-;   RTS
-; .endproc
 
 .proc draw_background
   PHP
@@ -588,14 +573,32 @@ tile_ppu:
   LDA pad1        ; Load button presses
   AND #BTN_LEFT   ; Filter out all but Left
   BEQ check_right ; If result is zero, left not pressed
-  DEC player_x  ; If the branch is not taken, move player left
+  LDA scroll
+  CMP #00  ; Compare scroll with minimum scroll value
+  BNE decrement_scroll  ; If scroll is not at min, decrement scroll
+  LDA player_x
+  CMP #00  ; Compare player_x with 00
+  BEQ check_right  ; If player_x is equal to 00, skip decrementing player_x
+  DEC player_x  ; If scroll is at min, decrement player x
+  JMP check_right  ; Skip to next check
+decrement_scroll:
+  DEC scroll  ; Decrement scroll
   LDA #DIR_LEFT  ; Update player direction to left
   STA player_dir
 check_right:
   LDA pad1
   AND #BTN_RIGHT
   BEQ check_up
-  INC player_x
+  LDA scroll
+  CMP #255  ; Compare scroll with maximum scroll value
+  BNE increment_scroll  ; If scroll is not at max, increment scroll
+  LDA player_x
+  CMP #240  ; Compare player_x with 245
+  BEQ check_up  ; If player_x is equal to f8, skip incrementing player_x
+  INC player_x  ; If scroll is at max, increment player x
+  JMP check_up  ; Skip to next check
+increment_scroll:
+  INC scroll
   LDA #DIR_RIGHT  ; Update player direction to right
   STA player_dir
 check_up:

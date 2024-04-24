@@ -3,6 +3,7 @@
 .segment "ZEROPAGE"
 .importzp player_x, player_y, frame_counter, animation_counter
 .importzp current_stage, scroll, ppuctrl_settings
+.importzp time_frame_counter, time_counter, players_lives
 
 .segment "CODE"
 .import main
