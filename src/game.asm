@@ -75,16 +75,16 @@ palettes:
   BNE skip_background
 
 init_stage_2_pos:
-  LDA #31
-  STA player_y 
-  LDA #$00
-  STA player_x
+	LDA #$00
+	STA player_x
+	LDA #$D0
+	STA player_y
 
   LDA current_stage 
   EOR #%11
   STA current_stage
 
-  jsr display_stage_background
+  jsr draw_background
   lda #$00
   sta background_flag
 
@@ -135,7 +135,7 @@ load_palettes:
 
   LDA #$01
   STA current_stage
-  JSR display_stage_background
+  JSR draw_background
 
 vblankwait:
   BIT PPUSTATUS
@@ -193,7 +193,7 @@ skip_change:
   RTS
 .endproc
 
-.proc display_stage_background
+.proc draw_background
   PHP
   PHA
   TXA
