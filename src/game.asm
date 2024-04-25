@@ -546,6 +546,7 @@ tile_ppu:
   RTS
 .endproc
 
+
 .proc update_player
   PHP  ; Start by saving registers,
   PHA  ; as usual.
