@@ -1,12 +1,13 @@
 .importzp current_stage, current_nametable
 .importzp player_x, player_y
 .importzp pad1
-.importzp player_win
+.importzp player_win, players_lives
 .importzp background_flag
 
 .include "constants.inc"
 
 .import reset_handler
+.import draw_win_timer
 
 .export win_screen
 .export next_stage
@@ -43,7 +44,11 @@ show_win_screen:
   LDA #$01
   STA player_win
 
+  LDA #$00
+  STA players_lives
+
   JSR draw_win
+  JSR draw_win_timer
 
   JMP Done
 

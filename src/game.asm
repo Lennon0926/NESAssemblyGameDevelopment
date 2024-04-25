@@ -29,11 +29,12 @@ time_counter: .res 1
 
 players_lives: .res 1
 player_win: .res 1
+win_timer: .res 1
 
 .exportzp player_x, player_y, pad1, frame_counter, animation_counter
 .exportzp scroll, scroll_flag
 .exportzp time_counter, time_frame_counter
-.exportzp players_lives, player_win
+.exportzp players_lives, player_win, win_timer
 .exportzp current_stage, current_nametable
 .exportzp background_flag
 

@@ -1,17 +1,278 @@
 .export draw_timer
 .export lose_screen
+.export draw_win_timer
 
 .include "constants.inc"
 
 .import reset_handler
 
-.importzp player_x
-.importzp player_y
-.importzp time_frame_counter
-.importzp time_counter
+.importzp player_x, player_y
+.importzp time_frame_counter, time_counter
 .importzp pad1
 .importzp players_lives
-.importzp player_win
+.importzp win_timer
+
+.proc draw_win_timer
+  PHP  ; Save registers
+  PHA
+  TXA
+  PHA
+  TYA
+  PHA
+  
+  LDA win_timer
+  CMP #$1E
+  BEQ jmp_draw_30
+  CMP #$1D
+  BEQ jmp_draw_29
+  CMP #$1C
+  BEQ jmp_draw_28
+  CMP #$1B
+  BEQ jmp_draw_27
+  CMP #$1A
+  BEQ jmp_draw_26
+  CMP #$19
+  BEQ jmp_draw_25
+  CMP #$18
+  BEQ jmp_draw_24
+  CMP #$17
+  BEQ jmp_draw_23
+  CMP #$16
+  BEQ jmp_draw_22
+  CMP #$15
+  BEQ jmp_draw_21
+  CMP #$14
+  BEQ jmp_draw_20
+  CMP #$13
+  BEQ jmp_draw_19
+  CMP #$12
+  BEQ jmp_draw_18
+  CMP #$11
+  BEQ jmp_draw_17
+  CMP #$10
+  BEQ jmp_draw_16
+  CMP #$0F
+  BEQ jmp_draw_15
+  CMP #$0E
+  BEQ jmp_draw_14
+  CMP #$0D
+  BEQ jmp_draw_13
+  CMP #$0C
+  BEQ jmp_draw_12
+  CMP #$0B
+  BEQ jmp_draw_11
+  CMP #$0A
+  BEQ jmp_draw_10
+  CMP #$09
+  BEQ jmp_draw_9
+  CMP #$08
+  BEQ jmp_draw_8
+  CMP #$07
+  BEQ jmp_draw_7
+  CMP #$06
+  BEQ jmp_draw_6
+  CMP #$05
+  BEQ jmp_draw_5
+  CMP #$04
+  BEQ jmp_draw_4
+  CMP #$03
+  BEQ jmp_draw_3
+  CMP #$02
+  BEQ jmp_draw_2
+  CMP #$01
+  BEQ jmp_draw_1
+
+jmp_draw_30:
+  JMP draw_30
+jmp_draw_29:
+  JMP draw_29
+jmp_draw_28:
+  JMP draw_28
+jmp_draw_27:
+  JMP draw_27
+jmp_draw_26:
+  JMP draw_26
+jmp_draw_25:
+  JMP draw_25
+jmp_draw_24:
+  JMP draw_24
+jmp_draw_23:
+  JMP draw_23
+jmp_draw_22:
+  JMP draw_22
+jmp_draw_21:
+  JMP draw_21
+jmp_draw_20:
+  JMP draw_20
+jmp_draw_19:
+  JMP draw_19
+jmp_draw_18:
+  JMP draw_18
+jmp_draw_17:
+  JMP draw_17
+jmp_draw_16:
+  JMP draw_16
+jmp_draw_15:
+  JMP draw_15
+jmp_draw_14:
+  JMP draw_14
+jmp_draw_13:
+  JMP draw_13
+jmp_draw_12:
+  JMP draw_12
+jmp_draw_11:
+  JMP draw_11
+jmp_draw_10:
+  JMP draw_10
+jmp_draw_9:
+  JMP draw_9
+jmp_draw_8:
+  JMP draw_8
+jmp_draw_7:
+  JMP draw_7
+jmp_draw_6:
+  JMP draw_6
+jmp_draw_5:
+  JMP draw_5
+jmp_draw_4:
+  JMP draw_4
+jmp_draw_3:
+  JMP draw_3
+jmp_draw_2:
+  JMP draw_2
+jmp_draw_1:
+  JMP draw_1
+
+draw_30:
+  JSR draw_3_left
+  JSR draw_0_right
+  JMP Done
+draw_29:
+  JSR draw_2_left
+  JSR draw_9_right
+  JMP Done
+draw_28:
+  JSR draw_2_left
+  JSR draw_8_right
+  JMP Done
+draw_27:
+  JSR draw_2_left
+  JSR draw_7_right
+  JMP Done
+draw_26:
+  JSR draw_2_left
+  JSR draw_6_right
+  JMP Done
+draw_25:
+  JSR draw_2_left
+  JSR draw_5_right
+  JMP Done
+draw_24:
+  JSR draw_2_left
+  JSR draw_4_right
+  JMP Done
+draw_23:
+  JSR draw_2_left
+  JSR draw_3_right
+  JMP Done
+draw_22:
+  JSR draw_2_left
+  JSR draw_2_right
+  JMP Done
+draw_21:
+  JSR draw_2_left
+  JSR draw_1_right
+  JMP Done
+draw_20:
+  JSR draw_2_left
+  JSR draw_0_right
+  JMP Done
+draw_19:
+  JSR draw_1_left
+  JSR draw_9_right
+  JMP Done
+draw_18:
+  JSR draw_1_left
+  JSR draw_8_right
+  JMP Done
+draw_17:
+  JSR draw_1_left
+  JSR draw_7_right
+  JMP Done
+draw_16:
+  JSR draw_1_left
+  JSR draw_6_right
+  JMP Done
+draw_15:
+  JSR draw_1_left
+  JSR draw_5_right
+  JMP Done
+draw_14:
+  JSR draw_1_left
+  JSR draw_4_right
+  JMP Done
+draw_13:
+  JSR draw_1_left
+  JSR draw_3_right
+  JMP Done
+draw_12:
+  JSR draw_1_left
+  JSR draw_2_right
+  JMP Done
+draw_11:
+  JSR draw_1_left
+  JSR draw_1_right
+  JMP Done
+draw_10:
+  JSR draw_1_left
+  JSR draw_0_right
+  JMP Done
+draw_9:
+  JSR draw_0_left
+  JSR draw_9_right
+  JMP Done
+draw_8:
+  JSR draw_0_left
+  JSR draw_8_right
+  JMP Done
+draw_7:
+  JSR draw_0_left
+  JSR draw_7_right
+  JMP Done
+draw_6:
+  JSR draw_0_left
+  JSR draw_6_right
+  JMP Done
+draw_5:
+  JSR draw_0_left
+  JSR draw_5_right
+  JMP Done
+draw_4:
+  JSR draw_0_left
+  JSR draw_4_right
+  JMP Done
+draw_3:
+  JSR draw_0_left
+  JSR draw_3_right
+  JMP Done
+draw_2:
+  JSR draw_0_left
+  JSR draw_2_right
+  JMP Done
+draw_1:
+  JSR draw_0_left
+  JSR draw_1_right
+  JMP Done
+
+Done:
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+  RTS
+.endproc
 
 .proc draw_lose
   PHP  ; Save registers
@@ -379,151 +640,181 @@ Number_30:
   JSR draw_0_right
   LDA #$3F
   STA time_frame_counter
+ 
   JMP Done
 
 Number_29:
   JSR draw_2_left
   JSR draw_9_right
+ 
   JMP Done
 
 Number_28:
   JSR draw_2_left
   JSR draw_8_right
+ 
   JMP Done
 
 Number_27:
   JSR draw_2_left
   JSR draw_7_right
+ 
   JMP Done
 
 Number_26:
   JSR draw_2_left
   JSR draw_6_right
+ 
   JMP Done
 
 Number_25:
   JSR draw_2_left
   JSR draw_5_right
+ 
   JMP Done
 
 Number_24:
   JSR draw_2_left
   JSR draw_4_right
+ 
   JMP Done
 
 Number_23:
   JSR draw_2_left
   JSR draw_3_right
+ 
   JMP Done
 
 Number_22:
   JSR draw_2_left
   JSR draw_2_right
+ 
   JMP Done
 
 Number_21:
   JSR draw_2_left
   JSR draw_1_right
+ 
   JMP Done
 
 Number_20:
   JSR draw_2_left
   JSR draw_0_right
+ 
   JMP Done
 
 Number_19:
   JSR draw_1_left
   JSR draw_9_right
+ 
   JMP Done
 
 Number_18:
   JSR draw_1_left
   JSR draw_8_right
+ 
   JMP Done
 
 Number_17:
   JSR draw_1_left
   JSR draw_7_right
+ 
   JMP Done
 
 Number_16:
   JSR draw_1_left
   JSR draw_6_right
+ 
   JMP Done
 
 Number_15:
   JSR draw_1_left
   JSR draw_5_right
+ 
   JMP Done
 
 Number_14:
   JSR draw_1_left
   JSR draw_4_right
+ 
   JMP Done
 
 Number_13:
   JSR draw_1_left
   JSR draw_3_right
+ 
   JMP Done
 
 Number_12:
   JSR draw_1_left
   JSR draw_2_right
+ 
   JMP Done
 
 Number_11:
   JSR draw_1_left
   JSR draw_1_right
+ 
   JMP Done
 
 Number_10:
   JSR draw_1_left
   JSR draw_0_right
+ 
   JMP Done
 
 Number_9:
   JSR draw_0_left
   JSR draw_9_right
+ 
   JMP Done
 
 Number_8:
   JSR draw_0_left
   JSR draw_8_right
+ 
   JMP Done
 
 Number_7:
   JSR draw_0_left
   JSR draw_7_right
+ 
   JMP Done
 
 Number_6:
   JSR draw_0_left
   JSR draw_6_right
+ 
   JMP Done
 
 Number_5:
   JSR draw_0_left
   JSR draw_5_right
+ 
   JMP Done
 
 Number_4:
   JSR draw_0_left
   JSR draw_4_right
+ 
   JMP Done
 
 Number_3:
   JSR draw_0_left
   JSR draw_3_right
+ 
   JMP Done
 
 Number_2:
   JSR draw_0_left
   JSR draw_2_right
+ 
   JMP Done
 
 Number_1:
   JSR draw_0_left
   JSR draw_1_right
+ 
   JMP Done
 
 Number_0:
@@ -536,11 +827,12 @@ Number_0:
 
 
 Done:
-INC time_frame_counter
-LDA time_frame_counter
-AND #$3F
-BNE skipIncrement
-INC time_counter
+  INC time_frame_counter
+  LDA time_frame_counter
+  AND #$3F
+  BNE skipIncrement
+  INC win_timer
+  INC time_counter
 
 skipIncrement:
   PLA
@@ -551,6 +843,7 @@ skipIncrement:
   PLP
   RTS
 .endproc
+
 .proc draw_0_left
   PHP  ; Save registers
   PHA

@@ -3,12 +3,13 @@
 .segment "ZEROPAGE"
 .importzp player_x, player_y, frame_counter, animation_counter
 .importzp current_stage, current_nametable, scroll, ppuctrl_settings, scroll_flag
-.importzp time_frame_counter, time_counter, players_lives, player_win
+.importzp time_frame_counter, time_counter, players_lives, player_win, win_timer
 .importzp background_flag
 
 .segment "CODE"
 .import main
 .export reset_handler
+
 .proc reset_handler
   SEI
   CLD
@@ -64,6 +65,9 @@ clear_oam:
 
   LDA #$00
   STA background_flag
+
+  LDA #$00
+  STA win_timer
 
   STA scroll
   STA scroll_flag
