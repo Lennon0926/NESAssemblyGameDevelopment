@@ -640,186 +640,247 @@ Number_30:
   JSR draw_0_right
   LDA #$3F
   STA time_frame_counter
- 
+  LDA #00
+  STA win_timer
   JMP Done
 
 Number_29:
   JSR draw_2_left
   JSR draw_9_right
+  LDA #01
+  STA win_timer
  
   JMP Done
 
 Number_28:
   JSR draw_2_left
   JSR draw_8_right
+  LDA #02
+  STA win_timer
  
   JMP Done
 
 Number_27:
   JSR draw_2_left
   JSR draw_7_right
- 
+  LDA #03
+  STA win_timer
+
   JMP Done
 
 Number_26:
   JSR draw_2_left
   JSR draw_6_right
- 
+  LDA #04
+  STA win_timer
+
   JMP Done
 
 Number_25:
   JSR draw_2_left
   JSR draw_5_right
+  LDA #05
+  STA win_timer
  
   JMP Done
 
 Number_24:
   JSR draw_2_left
   JSR draw_4_right
+  LDA #06
+  STA win_timer
  
   JMP Done
 
 Number_23:
   JSR draw_2_left
   JSR draw_3_right
+  LDA #07
+  STA win_timer
  
   JMP Done
 
 Number_22:
   JSR draw_2_left
   JSR draw_2_right
+  LDA #08
+  STA win_timer
  
   JMP Done
 
 Number_21:
   JSR draw_2_left
   JSR draw_1_right
+  LDA #09
+  STA win_timer
  
   JMP Done
 
 Number_20:
   JSR draw_2_left
   JSR draw_0_right
+  LDA #10
+  STA win_timer
  
   JMP Done
 
 Number_19:
   JSR draw_1_left
   JSR draw_9_right
+  LDA #11
+  STA win_timer
  
   JMP Done
 
 Number_18:
   JSR draw_1_left
   JSR draw_8_right
+  LDA #12
+  STA win_timer
  
   JMP Done
 
 Number_17:
   JSR draw_1_left
   JSR draw_7_right
+  LDA #13
+  STA win_timer
  
   JMP Done
 
 Number_16:
   JSR draw_1_left
   JSR draw_6_right
+  LDA #14
+  STA win_timer
  
   JMP Done
 
 Number_15:
   JSR draw_1_left
   JSR draw_5_right
+  LDA #15
+  STA win_timer
  
   JMP Done
 
 Number_14:
   JSR draw_1_left
   JSR draw_4_right
+  LDA #16
+  STA win_timer
  
   JMP Done
 
 Number_13:
   JSR draw_1_left
   JSR draw_3_right
+  LDA #17
+  STA win_timer
  
   JMP Done
 
 Number_12:
   JSR draw_1_left
   JSR draw_2_right
+  LDA #18
+  STA win_timer
  
   JMP Done
 
 Number_11:
   JSR draw_1_left
   JSR draw_1_right
+  LDA #19
+  STA win_timer
  
   JMP Done
 
 Number_10:
   JSR draw_1_left
   JSR draw_0_right
+  LDA #20
+  STA win_timer
  
   JMP Done
 
 Number_9:
   JSR draw_0_left
   JSR draw_9_right
+  LDA #21
+  STA win_timer
  
   JMP Done
 
 Number_8:
   JSR draw_0_left
   JSR draw_8_right
+  LDA #22
+  STA win_timer
  
   JMP Done
 
 Number_7:
   JSR draw_0_left
   JSR draw_7_right
+  LDA #23
+  STA win_timer
  
   JMP Done
 
 Number_6:
   JSR draw_0_left
   JSR draw_6_right
+  LDA #24
+  STA win_timer
  
   JMP Done
 
 Number_5:
   JSR draw_0_left
   JSR draw_5_right
+  LDA #25
+  STA win_timer
  
   JMP Done
 
 Number_4:
   JSR draw_0_left
   JSR draw_4_right
+  LDA #26
+  STA win_timer
  
   JMP Done
 
 Number_3:
   JSR draw_0_left
   JSR draw_3_right
+  LDA #27
+  STA win_timer
  
   JMP Done
 
 Number_2:
   JSR draw_0_left
   JSR draw_2_right
+  LDA #28
+  STA win_timer
  
   JMP Done
 
 Number_1:
   JSR draw_0_left
   JSR draw_1_right
+  LDA #29
+  STA win_timer
  
   JMP Done
 
 Number_0:
   JSR draw_0_left
   JSR draw_0_right
+  LDA #30
+  STA win_timer
   LDA #$00
   STA players_lives
   JSR lose_screen
@@ -831,7 +892,6 @@ Done:
   LDA time_frame_counter
   AND #$3F
   BNE skipIncrement
-  INC win_timer
   INC time_counter
 
 skipIncrement:
