@@ -557,6 +557,9 @@ tile_ppu:
   LDA pad1        ; Load button presses
   AND #BTN_UP     ; Filter out all but Up
   BEQ check_down  ; If result is zero, up not pressed
+  LDA player_y
+  CMP #32  ; Compare player_y with 32
+  BEQ check_down  ; If player_y is equal to 20, skip decrementing player_y
   DEC player_y
   LDA #DIR_UP  ; Update player direction to up
   STA player_dir
@@ -565,6 +568,9 @@ check_down:
   LDA pad1
   AND #BTN_DOWN
   BEQ check_left
+  LDA player_y
+  CMP #208  ; Compare player_y with 224
+  BEQ check_left  ; If player_y is equal to e0, skip incrementing player_y
   INC player_y
   LDA #DIR_DOWN  ; Update player direction to down
   STA player_dir
