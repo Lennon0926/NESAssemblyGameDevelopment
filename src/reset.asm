@@ -2,8 +2,9 @@
 
 .segment "ZEROPAGE"
 .importzp player_x, player_y, frame_counter, animation_counter
-.importzp current_stage, current_nametable, scroll, ppuctrl_settings
+.importzp current_stage, current_nametable, scroll, ppuctrl_settings, scroll_flag
 .importzp time_frame_counter, time_counter, players_lives, player_win
+.importzp background_flag
 
 .segment "CODE"
 .import main
@@ -60,6 +61,14 @@ clear_oam:
 
   LDA #$00
   STA current_nametable
+
+  LDA #$00
+  STA background_flag
+
+  STA scroll
+  STA scroll_flag
+  STA PPUSCROLL
+  STA PPUSCROLL 
   
 vblankwait2:
   BIT PPUSTATUS

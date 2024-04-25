@@ -35,6 +35,7 @@ player_win: .res 1
 .exportzp time_counter, time_frame_counter
 .exportzp players_lives, player_win
 .exportzp current_stage, current_nametable
+.exportzp background_flag
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
@@ -70,6 +71,7 @@ palettes:
 .import reset_game
 .import lose_screen
 .import win_screen
+.import next_stage
 
 .proc nmi_handler
   LDA #$00
@@ -82,6 +84,7 @@ palettes:
 
   ; read controller inputs
   JSR ReadController
+  JSR next_stage
   JSR win_screen
 
   LDA player_win
@@ -96,8 +99,6 @@ continue_game:
 	JSR update_player
   ; Draw player sprite
   JSR drawSprites
-  ; Change stage if necessary
-  JSR change_stage
   ; Draw timer
   JSR draw_timer
   ; check if background needs to be drawn
@@ -197,18 +198,6 @@ forever:
 .endproc
 
 ; -------------------------Subroutines-------------------------
-.proc change_stage
-  LDA pad1          ; Load the value of the controller input
-  CMP #%1000000     ; Compare it with the mask for the A button
-  BNE skip_change   ; If not equal, skip the stage change
-
-  LDA #$01          ; Set the background flag to switch the background
-  STA background_flag
-
-skip_change:
-  RTS               ; Return from subroutine
-.endproc
-
 .proc draw_background
   PHP
   PHA
